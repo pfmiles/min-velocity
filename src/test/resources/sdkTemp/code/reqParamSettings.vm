@@ -1,0 +1,7 @@
+#foreach($entry in ${api.paramInfo.entrySet()})
+    #if(${entry.value.simpleName.equalsIgnoreCase("Boolean")})
+        .setParam("${entry.key}", param.is$StringUtils.capitalize(${entry.key})())
+    #else
+        .setParam("${entry.key}", param.get$StringUtils.capitalize(${entry.key})())
+    #end
+#end

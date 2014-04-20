@@ -1,0 +1,32 @@
+package ${site.getBasePkgName()}.result.$StringUtils.remove(${ns.nsName}, ".");
+
+public class ${deepInfo.attClsName} {
+
+    #foreach($entry in ${deepInfo.entrySet()})
+    #if(${entry.value.simpleName})
+        #set($attClsName = ${entry.value.simpleName})
+    #else
+        #set($attClsName = ${entry.value.attClsName})
+    #end
+    private ${attClsName} ${entry.key};
+    #end
+
+    #foreach($entry in ${deepInfo.entrySet()})
+    #if(${entry.value.simpleName})
+        #set($attClsName = ${entry.value.simpleName})
+    #else
+        #set($attClsName = ${entry.value.attClsName})
+    #end
+    public ${attClsName} #if(${attClsName.equalsIgnoreCase("Boolean")})is$StringUtils.capitalize(${entry.key})#else get$StringUtils.capitalize(${entry.key})#end() {
+        return ${entry.key};
+    }
+
+    public void set$StringUtils.capitalize(${entry.key})(${attClsName} ${entry.key}) {
+        this.${entry.key} = ${entry.key};
+    }
+    #end
+
+    #set($toStrAttrs = ${deepInfo.entrySet()})
+    #parse("sdkTemp/code/toStringJson.vm")
+
+}

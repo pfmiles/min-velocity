@@ -1,0 +1,15 @@
+public String toString() {
+    return "{" 
+    #set($count = 0)
+    #foreach($entry in $toStrAttrs)
+        #set($key = ${entry.key})
+        #set($value = ${entry.value})
+        #if($count == 0)
+            + "'$key': " + #if(${value.simpleName} == "String")"'" + $key + "'"#else $key #end
+        #else
+            + ", '$key': " + #if(${value.simpleName} == "String")"'" + $key + "'"#else $key #end
+        #end
+    #set($count = $count + 1)
+    #end
+    + "}";
+}

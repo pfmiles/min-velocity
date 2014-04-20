@@ -1,0 +1,22 @@
+package ${site.getBasePkgName()}.param.$StringUtils.remove(${ns.nsName}, ".");
+
+public class $StringUtils.capitalize(${api.methodName})Param {
+
+    #foreach($entry in ${api.paramInfo.entrySet()})
+    private ${entry.value.simpleName} ${entry.key};
+    #end
+
+    #foreach($entry in ${api.paramInfo.entrySet()})
+    public ${entry.value.simpleName} #if(${entry.value.simpleName.equalsIgnoreCase("Boolean")})is$StringUtils.capitalize(${entry.key})#else get$StringUtils.capitalize(${entry.key})#end() {
+        return ${entry.key};
+    }
+
+    public void set$StringUtils.capitalize(${entry.key})(${entry.value.simpleName} ${entry.key}) {
+        this.${entry.key} = ${entry.key};
+    }
+    #end
+    
+    #set($toStrAttrs = ${api.paramInfo.entrySet()})
+    #parse("sdkTemp/code/toStringJson.vm")
+
+}

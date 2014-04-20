@@ -1,0 +1,14 @@
+#if($StringUtils.isNotBlank(${api.resultLocatingExpr}))
+    #set($locatingStr = ${api.resultLocatingExpr.trim()})
+    #if(!${locatingStr.equals("/")} && ${locatingStr.startsWith("/")})
+        #foreach($seg in ${locatingStr.substring(1).split("/")})
+            #if($StringUtils.contains($seg, "["))
+                #set($index = $StringUtils.substringBetween($seg, "[", "]"))
+                #set($key = $StringUtils.substringBefore($seg, "["))
+                map = ((Map<String, Object>[])map.get("$key"))[$index];
+            #else
+                map = (Map<String, Object>)map.get("$seg");
+            #end
+        #end
+    #end
+#end

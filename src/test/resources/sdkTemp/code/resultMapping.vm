@@ -1,0 +1,12 @@
+#foreach($entry in ${resultInfoEntries})
+    #if(${entry.value.simpleName})
+        ${mappingObjName}.set$StringUtils.capitalize(${entry.key})((#if(${entry.value.isPrimitive()})$ClassUtils.primitiveToWrapper(${entry.value}).getSimpleName()#else${entry.value.simpleName}#end) map.get("${entry.key}"));
+    #else
+        #set($pojoClsName = ${entry.value.attClsName})
+        #set($pojoName = "$StringUtils.uncapitalize(${pojoClsName})Var")
+        ${pojoClsName} ${pojoName} = new ${pojoClsName}();
+        $BizUtil.recParsing("/sdkTemp/code/resultMapping.vm").addParam("mappingObjName", ${pojoName}).addParam("resultInfoEntries", ${entry.value.entrySet()})
+        ${mappingObjName}.set$StringUtils.capitalize(${entry.key})(${pojoName});
+    #end
+
+#end

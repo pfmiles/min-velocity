@@ -1,0 +1,218 @@
+package ${site.getBasePkgName()};
+
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import com.alibaba.openapi.client.AlibabaClient;
+import com.alibaba.openapi.client.Request;
+import com.alibaba.openapi.client.auth.AuthorizationToken;
+#foreach($ns in $infos)
+import ${site.getBasePkgName()}.param.$StringUtils.remove(${ns.nsName}, ".").*;    
+import ${site.getBasePkgName()}.result.$StringUtils.remove(${ns.nsName}, ".").*;    
+#end
+import com.alibaba.openapi.client.policy.ClientPolicy;
+import com.alibaba.openapi.client.policy.RequestPolicy;
+import com.alibaba.openapi.client.policy.RequestPolicy.HttpMethodPolicy;
+
+/**
+ * API调用的入口
+ */
+public final class ${site.getMainClsName()} {
+
+    private static AlibabaClient                client;
+
+    private static final ReentrantReadWriteLock rw         = new ReentrantReadWriteLock();
+    private static final ReadLock               r          = rw.readLock();
+    private static final WriteLock              w          = rw.writeLock();
+
+    private static String                       serverHost = "${site.getServerHost()}";
+    private static int                          httpPort   = 80;
+    private static int                          httpsPort  = 443;
+    private static int                          appKey     = -1;
+    private static String                       secKey;
+    private static int                          timeout    = -1;
+
+    /**
+     * 设置开放平台网关地址
+     * 
+     * @param host 网关地址，默认为"${site.getServerHost()}"
+     */
+    public static final void setServerHost(String host) {
+        serverHost = host;
+    }
+
+    /**
+     * 设置http端口
+     * 
+     * @param port http端口, 默认为80
+     */
+    public static final void setHttpPort(int port) {
+        httpPort = port;
+    }
+
+    /**
+     * 设置https端口
+     * 
+     * @param port https端口，默认为443
+     */
+    public static final void setHttpsPort(int port) {
+        httpsPort = port;
+    }
+
+    /**
+     * 设置appKey
+     * 
+     * @param appKey
+     */
+    public static final void setAppKey(int appKey) {
+        ${site.getMainClsName()}.appKey = appKey;
+    }
+
+    /**
+     * 设置签名密钥
+     * 
+     * @param secKey 签名密钥
+     */
+    public static final void setSigningKey(String secKey) {
+        ${site.getMainClsName()}.secKey = secKey;
+    }
+
+    /**
+     * 设置调用超时，单位为毫秒
+     * 
+     * @param timeout 超时，默认为3000
+     */
+    public static final void setTimeout(int timeout) {
+        ${site.getMainClsName()}.timeout = timeout;
+    }
+
+    private static void initClient() {
+        if (client != null) return;
+        ClientPolicy clientPolicy = new ClientPolicy(serverHost);
+        clientPolicy.setHttpPort(httpPort).setHttpsPort(httpsPort).setSigningKey(secKey).setAppKey(String.valueOf(appKey)).setTimeout(timeout);
+        client = new AlibabaClient(clientPolicy);
+        client.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            public void run() {
+                r.lock();
+                try {
+                    if (client == null) return;
+                    client.shutdown();
+                } finally {
+                    r.unlock();
+                }
+            }
+        });
+    }
+
+    /**
+     * 根据授权码换取授权令牌
+     * 
+     * @param code 授权码
+     * @return 授权令牌
+     */
+    public static final AuthorizationToken getToken(String code) {
+        r.lock();
+        try {
+            if (client == null) {
+                r.unlock();
+                w.lock();
+                try {
+                    initClient();
+                } finally {
+                    r.lock();
+                    w.unlock();
+                }
+            }
+            return client.getToken(code);
+        } finally {
+            r.unlock();
+        }
+    }
+
+    /**
+     * 根据refreshToken刷新授权令牌
+     * 
+     * @param refreshToken
+     * @return 新的授权令牌
+     */
+    public static final AuthorizationToken refreshToken(String refreshToken) {
+        r.lock();
+        try {
+            if (client == null) {
+                r.unlock();
+                w.lock();
+                try {
+                    initClient();
+                } finally {
+                    r.lock();
+                    w.unlock();
+                }
+            }
+            return client.refreshToken(refreshToken);
+        } finally {
+            r.unlock();
+        }
+    }
+
+    #foreach($ns in $infos)
+    /**
+     * 命名空间：${ns.nsName}
+     */
+    public static final class ${ns.nsInterfaceName} {
+        #foreach($api in ${ns.apiInfos})
+        /**
+         * ${api.doc}
+         */
+        @SuppressWarnings("unchecked")
+        public static final $StringUtils.capitalize(${api.methodName})Result ${api.methodName}($StringUtils.capitalize(${api.methodName})Param param#if(${api.needAuthorization}), String accessToken#end) {
+            RequestPolicy reqPolicy = new RequestPolicy();
+            reqPolicy.setHttpMethod(HttpMethodPolicy.POST).setNeedAuthorization(${api.needAuthorization}).setRequestSendTimestamp(${api.needTimeStamp}).setUseHttps(${api.needHttps}).setUseSignture(${api.needSignature}).setAccessPrivateApi(${api.innerApi});
+            r.lock();
+            try {
+                if (client == null) {
+                    r.unlock();
+                    w.lock();
+                    try {
+                        initClient();
+                    } finally {
+                        r.lock();
+                        w.unlock();
+                    }
+                }
+                Map<String, Object> map = client.send(new Request("${ns.nsName}", "${api.apiName}", ${api.apiVer})#if(${api.needAuthorization}).setAccessToken(accessToken)#end
+
+                                                      #parse("sdkTemp/code/reqParamSettings.vm")
+                                                      , Map.class, reqPolicy);
+                #parse("sdkTemp/code/resultLocating.vm")
+                
+                $StringUtils.capitalize(${api.methodName})Result ret = new $StringUtils.capitalize(${api.methodName})Result();
+                #set($resultInfoEntries = ${api.resultInfo.entrySet()})
+                #set($mappingObjName = "ret")
+                #parse("sdkTemp/code/resultMapping.vm")
+                return ret;
+            } catch (InterruptedException e) {
+                $StringUtils.capitalize(${api.methodName})Result ret = new $StringUtils.capitalize(${api.methodName})Result();
+                ret.setError("Interrupted.");
+                return ret;
+            } catch (ExecutionException e) {
+                $StringUtils.capitalize(${api.methodName})Result ret = new $StringUtils.capitalize(${api.methodName})Result();
+                ret.setError(e.getCause().toString());
+                return ret;
+            } catch (TimeoutException e) {
+                $StringUtils.capitalize(${api.methodName})Result ret = new $StringUtils.capitalize(${api.methodName})Result();
+                ret.setError("Request timed out.");
+                return ret;
+            } finally {
+                r.unlock();
+            }
+        }
+        #end
+    }
+    #end
+}

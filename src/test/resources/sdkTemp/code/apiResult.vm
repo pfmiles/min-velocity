@@ -1,0 +1,46 @@
+package ${site.getBasePkgName()}.result.$StringUtils.remove(${ns.nsName}, ".");
+
+public class $StringUtils.capitalize(${api.methodName})Result {
+
+    private String errMsg;
+
+    #foreach($entry in ${api.resultInfo.entrySet()})
+    #if(${entry.value.simpleName})
+        #set($attClsName = ${entry.value.simpleName})
+    #else
+        #set($attClsName = ${entry.value.attClsName})
+    #end
+    private ${attClsName} ${entry.key};
+    #end
+
+    public void setError(String errMsg) {
+        this.errMsg = errMsg;
+    }
+
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public boolean isError() {
+        return this.errMsg != null;
+    }
+
+    #foreach($entry in ${api.resultInfo.entrySet()})
+    #if(${entry.value.simpleName})
+        #set($attClsName = ${entry.value.simpleName})
+    #else
+        #set($attClsName = ${entry.value.attClsName})
+    #end
+    public ${attClsName} #if(${attClsName.equalsIgnoreCase("Boolean")})is$StringUtils.capitalize(${entry.key})#else get$StringUtils.capitalize(${entry.key})#end() {
+        return ${entry.key};
+    }
+
+    public void set$StringUtils.capitalize(${entry.key})(${attClsName} ${entry.key}) {
+        this.${entry.key} = ${entry.key};
+    }
+    #end
+
+    #set($toStrAttrs = ${api.resultInfo.entrySet()})
+    #parse("sdkTemp/code/toStringJson.vm")
+
+}
