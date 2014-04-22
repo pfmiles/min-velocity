@@ -44,8 +44,8 @@ public interface RuntimeConstants
      * ----------------------------------------------------------------------
      */
 
-    /** Location of the velocity log file. */
-    String RUNTIME_LOG = "runtime.log";
+//    /** Location of the velocity log file?. */
+//    String RUNTIME_LOG = "runtime.log";
 
     /** externally provided logger. */
     String RUNTIME_LOG_LOGSYSTEM = "runtime.log.logsystem";
@@ -63,53 +63,53 @@ public interface RuntimeConstants
      */
     String RUNTIME_REFERENCES_STRICT_ESCAPE = "runtime.references.strict.escape";
        
-    /**
-     * @deprecated  This appears to have always been meaningless.
-     */
-    String RUNTIME_LOG_ERROR_STACKTRACE = "runtime.log.error.stacktrace";
+//    /**
+//     * @deprecated  This appears to have always been meaningless.
+//     */
+//    String RUNTIME_LOG_ERROR_STACKTRACE = "runtime.log.error.stacktrace";
+//
+//    /**
+//     * @deprecated  The functionality this controlled is confusing and no longer necessary.
+//     */
+//    String RUNTIME_LOG_WARN_STACKTRACE = "runtime.log.warn.stacktrace";
+//
+//    /**
+//     * @deprecated  This appears to have always been meaningless.
+//     */
+//    String RUNTIME_LOG_INFO_STACKTRACE = "runtime.log.info.stacktrace";
+//
+      /** Logging of invalid references. */
+      String RUNTIME_LOG_REFERENCE_LOG_INVALID = "runtime.log.invalid.references";
 
-    /**
-     * @deprecated  The functionality this controlled is confusing and no longer necessary.
-     */
-    String RUNTIME_LOG_WARN_STACKTRACE = "runtime.log.warn.stacktrace";
-
-    /**
-     * @deprecated  This appears to have always been meaningless.
-     */
-    String RUNTIME_LOG_INFO_STACKTRACE = "runtime.log.info.stacktrace";
-
-    /** Logging of invalid references. */
-    String RUNTIME_LOG_REFERENCE_LOG_INVALID = "runtime.log.invalid.references";
-
-    /**
-     * @deprecated  Use LogChute.TRACE_PREFIX instead
-     */
-    String TRACE_PREFIX = " [trace] ";
-
-    /**
-     * @deprecated  Use LogChute.DEBUG_PREFIX instead
-     */
-    String DEBUG_PREFIX = " [debug] ";
-
-    /**
-     * @deprecated  Use LogChute.INFO_PREFIX instead
-     */
-    String INFO_PREFIX = "  [info] ";
-
-    /**
-     * @deprecated  Use LogChute.WARN_PREFIX instead
-     */
-    String WARN_PREFIX = "  [warn] ";
-
-    /**
-     * @deprecated  Use LogChute.ERROR_PREFIX instead
-     */
-    String ERROR_PREFIX = " [error] ";
-
-    /**
-     * @deprecated  This will be removed in a future version
-     */
-    String UNKNOWN_PREFIX = " [unknown] ";
+//    /**
+//     * @deprecated  Use LogChute.TRACE_PREFIX instead
+//     */
+//    String TRACE_PREFIX = " [trace] ";
+//
+//    /**
+//     * @deprecated  Use LogChute.DEBUG_PREFIX instead
+//     */
+//    String DEBUG_PREFIX = " [debug] ";
+//
+//    /**
+//     * @deprecated  Use LogChute.INFO_PREFIX instead
+//     */
+//    String INFO_PREFIX = "  [info] ";
+//
+//    /**
+//     * @deprecated  Use LogChute.WARN_PREFIX instead
+//     */
+//    String WARN_PREFIX = "  [warn] ";
+//
+//    /**
+//     * @deprecated  Use LogChute.ERROR_PREFIX instead
+//     */
+//    String ERROR_PREFIX = " [error] ";
+//
+//    /**
+//     * @deprecated  This will be removed in a future version
+//     */
+//    String UNKNOWN_PREFIX = " [unknown] ";
 
     /*
      * ----------------------------------------------------------------------
