@@ -366,7 +366,7 @@ public interface RuntimeConstants
      * The default number of parser instances to create. Configurable via the parameter named by the {@link #PARSER_POOL_SIZE}
      * constant.
      */
-    int NUMBER_OF_PARSERS = 20;
+    int NUMBER_OF_PARSERS = 1;
 
     
 

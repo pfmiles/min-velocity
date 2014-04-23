@@ -1,10 +1,18 @@
-/*
- * Copyright 2014 Alibaba.com All right reserved. This software is the
- * confidential and proprietary information of Alibaba.com ("Confidential
- * Information"). You shall not disclose such Confidential Information and shall
- * use it only in accordance with the terms of the license agreement you entered
- * into with Alibaba.com.
- */
+/*******************************************************************************
+ * Copyright 2014 pf-miles
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package com.github.pfmiles.minvelocity.biztest;
 
 import java.io.IOException;
@@ -14,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-
 
 /**
  * 根据apiMeta，生成业务sdk代码的util类
@@ -26,8 +33,10 @@ public class ApiCodeGenUtil {
     /**
      * 根据meta信息和集群信息，生成业务sdk java源码
      * 
-     * @param infos ns/api meta
-     * @param site 集群/站点
+     * @param infos
+     *            ns/api meta
+     * @param site
+     *            集群/站点
      * @return 业务sdk源码
      */
     public static BizSdkCodeResult generate(List<NsInfo> infos, Site site) {
@@ -47,12 +56,9 @@ public class ApiCodeGenUtil {
                 ctxPojo.put("site", site);
                 ctxPojo.put("api", api);
                 ctxPojo.put("ns", ns);
-                JavaSourceFile rstFile = new JavaSourceFile(
-                                                            StringUtils.capitalize(api.getMethodName()) + "Result.java",
-                                                            site.getBasePkgName() + ".result." + ns.getNsName(),
-                                                            TemplateRenderUtil.render("sdkTemp/code/apiResult.vm",
-                                                                                      ctxPojo));
-//                JavaCodeFormattingUtil.tryFormat(rstFile);
+                JavaSourceFile rstFile = new JavaSourceFile(StringUtils.capitalize(api.getMethodName()) + "Result.java", site.getBasePkgName()
+                        + ".result." + ns.getNsName(), TemplateRenderUtil.render("sdkTemp/code/apiResult.vm", ctxPojo));
+                // JavaCodeFormattingUtil.tryFormat(rstFile);
                 ret.add(rstFile);
                 // 生成深度result类源码：
                 for (DeepAttrInfo deepInfo : extractDeepInfos(api.getResultInfo())) {
@@ -60,13 +66,9 @@ public class ApiCodeGenUtil {
                     deepCtx.put("site", site);
                     deepCtx.put("ns", ns);
                     deepCtx.put("deepInfo", deepInfo);
-                    JavaSourceFile deepFile = new JavaSourceFile(
-                                                                 StringUtils.capitalize(deepInfo.getAttClsName())
-                                                                         + ".java",
-                                                                 site.getBasePkgName() + ".result." + ns.getNsName(),
-                                                                 TemplateRenderUtil.render("sdkTemp/code/deepResultBean.vm",
-                                                                                           deepCtx));
-//                    JavaCodeFormattingUtil.tryFormat(deepFile);
+                    JavaSourceFile deepFile = new JavaSourceFile(StringUtils.capitalize(deepInfo.getAttClsName()) + ".java", site.getBasePkgName()
+                            + ".result." + ns.getNsName(), TemplateRenderUtil.render("sdkTemp/code/deepResultBean.vm", deepCtx));
+                    // JavaCodeFormattingUtil.tryFormat(deepFile);
                     ret.add(deepFile);
                 }
             }
@@ -94,12 +96,9 @@ public class ApiCodeGenUtil {
                 ctxPojo.put("site", site);
                 ctxPojo.put("api", api);
                 ctxPojo.put("ns", ns);
-                JavaSourceFile paramFile = new JavaSourceFile(StringUtils.capitalize(api.getMethodName())
-                                                              + "Param.java", site.getBasePkgName() + ".param."
-                                                                              + ns.getNsName(),
-                                                              TemplateRenderUtil.render("sdkTemp/code/apiParam.vm",
-                                                                                        ctxPojo));
-//                JavaCodeFormattingUtil.tryFormat(paramFile);
+                JavaSourceFile paramFile = new JavaSourceFile(StringUtils.capitalize(api.getMethodName()) + "Param.java", site.getBasePkgName()
+                        + ".param." + ns.getNsName(), TemplateRenderUtil.render("sdkTemp/code/apiParam.vm", ctxPojo));
+                // JavaCodeFormattingUtil.tryFormat(paramFile);
                 ret.add(paramFile);
             }
         }
@@ -111,9 +110,9 @@ public class ApiCodeGenUtil {
         Map<String, Object> ctxPojo = new HashMap<String, Object>();
         ctxPojo.put("infos", infos);
         ctxPojo.put("site", site);
-        JavaSourceFile ret = new JavaSourceFile(site.getMainClsName() + ".java", site.getBasePkgName(),
-                                                TemplateRenderUtil.render("sdkTemp/code/ApiFacade.vm", ctxPojo));
-//        JavaCodeFormattingUtil.tryFormat(ret);
+        JavaSourceFile ret = new JavaSourceFile(site.getMainClsName() + ".java", site.getBasePkgName(), TemplateRenderUtil.render(
+                "sdkTemp/code/ApiFacade.vm", ctxPojo));
+        // JavaCodeFormattingUtil.tryFormat(ret);
         return ret;
     }
 

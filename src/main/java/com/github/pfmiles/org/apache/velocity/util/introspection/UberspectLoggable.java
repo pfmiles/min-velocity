@@ -19,7 +19,6 @@ package com.github.pfmiles.org.apache.velocity.util.introspection;
  * under the License.    
  */
 
-import com.github.pfmiles.org.apache.velocity.runtime.RuntimeLogger;
 import com.github.pfmiles.org.apache.velocity.runtime.log.Log;
 
 /**

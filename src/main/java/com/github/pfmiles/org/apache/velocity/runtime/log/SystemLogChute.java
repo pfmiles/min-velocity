@@ -15,13 +15,13 @@ public class SystemLogChute implements LogChute {
         switch (level) {
         case LogChute.ERROR_ID:
         case LogChute.WARN_ID:
-            System.out.println(message);
+            System.err.println(message);
             return;
         case LogChute.DEBUG_ID:
         case LogChute.INFO_ID:
         case LogChute.TRACE_ID:
         default:
-            System.err.println(message);
+            System.out.println(message);
             return;
         }
     }
@@ -30,14 +30,14 @@ public class SystemLogChute implements LogChute {
         switch (level) {
         case LogChute.ERROR_ID:
         case LogChute.WARN_ID:
-            System.out.println(message);
+            System.err.println(message);
             t.printStackTrace(System.out);
             return;
         case LogChute.DEBUG_ID:
         case LogChute.INFO_ID:
         case LogChute.TRACE_ID:
         default:
-            System.err.println(message);
+            System.out.println(message);
             t.printStackTrace(System.err);
             return;
         }

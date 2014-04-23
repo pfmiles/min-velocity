@@ -34,13 +34,6 @@ import java.util.Properties;
 import com.github.pfmiles.org.apache.commons.collections.ExtendedProperties;
 import com.github.pfmiles.org.apache.commons.lang.text.StrBuilder;
 import com.github.pfmiles.org.apache.velocity.Template;
-//import com.github.pfmiles.org.apache.velocity.app.event.EventCartridge;
-//import com.github.pfmiles.org.apache.velocity.app.event.EventHandler;
-//import com.github.pfmiles.org.apache.velocity.app.event.IncludeEventHandler;
-//import com.github.pfmiles.org.apache.velocity.app.event.InvalidReferenceEventHandler;
-//import com.github.pfmiles.org.apache.velocity.app.event.MethodExceptionEventHandler;
-//import com.github.pfmiles.org.apache.velocity.app.event.NullSetEventHandler;
-//import com.github.pfmiles.org.apache.velocity.app.event.ReferenceInsertionEventHandler;
 import com.github.pfmiles.org.apache.velocity.context.Context;
 import com.github.pfmiles.org.apache.velocity.context.InternalContextAdapterImpl;
 import com.github.pfmiles.org.apache.velocity.exception.MethodInvocationException;
@@ -54,7 +47,6 @@ import com.github.pfmiles.org.apache.velocity.runtime.log.Log;
 import com.github.pfmiles.org.apache.velocity.runtime.log.LogManager;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.ParseException;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.Parser;
-import com.github.pfmiles.org.apache.velocity.runtime.parser.node.Node;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.node.SimpleNode;
 import com.github.pfmiles.org.apache.velocity.runtime.resource.ContentResource;
 import com.github.pfmiles.org.apache.velocity.runtime.resource.ResourceManager;
@@ -179,7 +171,7 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
      * And a configuration is a lot more convenient to deal
      * with then conventional properties objects, or Maps.
      */
-    private  ExtendedProperties configuration = new ExtendedProperties();
+    private ExtendedProperties configuration = new ExtendedProperties();
 
     private ResourceManager resourceManager = null;
 
@@ -254,7 +246,7 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
             initializing = true;
 
             log.trace("*******************************************************************");
-            log.debug("Starting Apache Velocity v@build.version@ (compiled: @build.time@)");
+            log.debug("Starting pf_miles' Min-Velocity v1.0 (based on Apache Velocity v1.7)");
             log.trace("RuntimeInstance initializing.");
 
             initializeProperties();

@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.github.pfmiles.org.apache.velocity.util.MapFactory;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -45,7 +44,7 @@ public class MethodMap
     /**
      * Keep track of all methods with the same name.
      */
-    Map methodByNameMap = MapFactory.create(false);
+    Map methodByNameMap = new ConcurrentHashMap();
 
     /**
      * Add a method to a list of methods by name.

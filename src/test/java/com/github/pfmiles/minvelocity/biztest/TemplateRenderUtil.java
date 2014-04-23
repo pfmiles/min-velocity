@@ -1,10 +1,18 @@
-/*
- * Copyright 2014 Alibaba.com All right reserved. This software is the
- * confidential and proprietary information of Alibaba.com ("Confidential
- * Information"). You shall not disclose such Confidential Information and shall
- * use it only in accordance with the terms of the license agreement you entered
- * into with Alibaba.com.
- */
+/*******************************************************************************
+ * Copyright 2014 pf-miles
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package com.github.pfmiles.minvelocity.biztest;
 
 import java.beans.BeanInfo;
@@ -21,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import com.github.pfmiles.org.apache.velocity.VelocityContext;
 import com.github.pfmiles.org.apache.velocity.app.VelocityEngine;
 import com.github.pfmiles.org.apache.velocity.context.Context;
-import com.github.pfmiles.org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 /**
  * 渲染模板util, 用于根据业务数据和模板文件，生成java源码、pdf文档等
@@ -33,11 +40,6 @@ public class TemplateRenderUtil {
     private static final Properties props = new Properties();
     private static final VelocityEngine tempEngine = new VelocityEngine();
     static {
-        props.put(VelocityEngine.ENCODING_DEFAULT, "UTF-8");
-        props.put(VelocityEngine.INPUT_ENCODING, "UTF-8");
-        props.put(VelocityEngine.RESOURCE_LOADER, "classpath");
-        props.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-        props.put(VelocityEngine.SET_NULL_ALLOWED, "true");
         try {
             tempEngine.init(props);
         } catch (Exception e) {

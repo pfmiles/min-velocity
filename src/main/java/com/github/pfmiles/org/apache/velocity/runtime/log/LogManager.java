@@ -88,25 +88,6 @@ public class LogManager
                     throw new VelocityException(msg, e);
                 }
             }
-            // then check for a LogSystem
-//            else if (o instanceof LogSystem)
-//            {
-//                // inform the user about the deprecation
-//                log.debug("LogSystem has been deprecated. Please use a LogChute implementation.");
-//                try
-//                {
-//                    // wrap the LogSystem into a chute.
-//                    LogChute chute = new LogChuteSystem((LogSystem)o);
-//                    chute.init(rsvc);
-//                    return chute;
-//                }
-//                catch (Exception e)
-//                {
-//                    String msg = "Could not init runtime.log.logsystem " + o;
-//                    log.error(msg, e);
-//                    throw new VelocityException(msg, e);
-//                }
-//            }
             else
             {
                 String msg = o.getClass().getName() + " object set as runtime.log.logsystem is not a valid log implementation.";

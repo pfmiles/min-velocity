@@ -22,11 +22,11 @@ package com.github.pfmiles.org.apache.velocity.runtime.resource;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.pfmiles.org.apache.commons.collections.map.LRUMap;
 import com.github.pfmiles.org.apache.velocity.runtime.RuntimeConstants;
 import com.github.pfmiles.org.apache.velocity.runtime.RuntimeServices;
-import com.github.pfmiles.org.apache.velocity.util.MapFactory;
 
 /**
  * Default implementation of the resource cache for the default
@@ -47,7 +47,7 @@ public class ResourceCacheImpl implements ResourceCache
     /**
      * Cache storage, assumed to be thread-safe.
      */
-    protected Map cache = MapFactory.create(512, 0.5f, 30, false);
+    protected Map cache = new ConcurrentHashMap();
 
     /**
      * Runtime services, generally initialized by the

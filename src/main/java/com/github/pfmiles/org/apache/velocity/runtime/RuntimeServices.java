@@ -50,7 +50,7 @@ import com.github.pfmiles.org.apache.velocity.util.introspection.Uberspect;
  * @author <a href="mailto:geirm@optonline.net">Geir Magusson Jr.</a>
  * @version $Id: RuntimeServices.java 898050 2010-01-11 20:15:31Z nbubna $
  */
-public interface RuntimeServices extends RuntimeLogger
+public interface RuntimeServices
 {
 
    /**

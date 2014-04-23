@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>min-velocity</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/pfmiles/min-velocity</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
