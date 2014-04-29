@@ -147,13 +147,12 @@ public class Parse extends InputBase
         /*
          *  get the path
          */
-        String sourcearg = value == null ? null : value.toString();
+        String arg = value == null ? null : value.toString();
 
         /*
          *  check to see if the argument will be changed by the event cartridge
          */
 //        String arg = EventHandlerUtil.includeEvent( rsvc, context, sourcearg, context.getCurrentTemplateName(), getName());
-        String arg = sourcearg;
         /*
          *   a null return value from the event cartridge indicates we should not
          *   input a resource.
@@ -231,22 +230,22 @@ public class Parse extends InputBase
             throw new VelocityException(msg, e);
         }
 
-        /**
-         * Add the template name to the macro libraries list
-         */
-        List macroLibraries = context.getMacroLibraries();
+//        /**
+//         * Add the template name to the macro libraries list
+//         */
+//        List macroLibraries = context.getMacroLibraries();
 
-        /**
-         * if macroLibraries are not set create a new one
-         */
-        if (macroLibraries == null)
-        {
-            macroLibraries = new ArrayList();
-        }
-
-        context.setMacroLibraries(macroLibraries);
-
-        macroLibraries.add(arg);
+//        /**
+//         * if macroLibraries are not set create a new one
+//         */
+//        if (macroLibraries == null)
+//        {
+//            macroLibraries = new ArrayList();
+//        }
+//
+//        context.setMacroLibraries(macroLibraries);
+//
+//        macroLibraries.add(arg);
 
         /*
          *  and render it

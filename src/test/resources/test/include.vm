@@ -1,0 +1,4 @@
+Not Included
+#include("test/included.vm")
+
+Not Included

@@ -144,50 +144,50 @@ public final class InternalContextAdapterImpl implements InternalContextAdapter
         return icb.getTemplateNameStack();
     }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#pushCurrentMacroName(java.lang.String)
-     * @since 1.6
-     */
-    public void pushCurrentMacroName( String s )
-    {
-        icb.pushCurrentMacroName( s );
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#pushCurrentMacroName(java.lang.String)
+//     * @since 1.6
+//     */
+//    public void pushCurrentMacroName( String s )
+//    {
+//        icb.pushCurrentMacroName( s );
+//    }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#popCurrentMacroName()
-     * @since 1.6
-     */
-    public void popCurrentMacroName()
-    {
-        icb.popCurrentMacroName();
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#popCurrentMacroName()
+//     * @since 1.6
+//     */
+//    public void popCurrentMacroName()
+//    {
+//        icb.popCurrentMacroName();
+//    }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#getCurrentMacroName()
-     * @since 1.6
-     */
-    public String getCurrentMacroName()
-    {
-        return icb.getCurrentMacroName();
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#getCurrentMacroName()
+//     * @since 1.6
+//     */
+//    public String getCurrentMacroName()
+//    {
+//        return icb.getCurrentMacroName();
+//    }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#getCurrentMacroCallDepth()
-     * @since 1.6
-     */
-    public int getCurrentMacroCallDepth()
-    {
-        return icb.getCurrentMacroCallDepth();
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#getCurrentMacroCallDepth()
+//     * @since 1.6
+//     */
+//    public int getCurrentMacroCallDepth()
+//    {
+//        return icb.getCurrentMacroCallDepth();
+//    }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#getMacroNameStack()
-     * @since 1.6
-     */
-    public Object[] getMacroNameStack()
-    {
-        return icb.getMacroNameStack();
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#getMacroNameStack()
+//     * @since 1.6
+//     */
+//    public Object[] getMacroNameStack()
+//    {
+//        return icb.getMacroNameStack();
+//    }
 
     /**
      * @see org.apache.velocity.context.InternalHousekeepingContext#icacheGet(java.lang.Object)
@@ -221,23 +221,23 @@ public final class InternalContextAdapterImpl implements InternalContextAdapter
         return icb.getCurrentResource();
     }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#setMacroLibraries(List)
-     * @since 1.6
-     */
-    public void setMacroLibraries(List macroLibraries)
-    {
-        icb.setMacroLibraries(macroLibraries);
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#setMacroLibraries(List)
+//     * @since 1.6
+//     */
+//    public void setMacroLibraries(List macroLibraries)
+//    {
+//        icb.setMacroLibraries(macroLibraries);
+//    }
 
-    /**
-     * @see org.apache.velocity.context.InternalHousekeepingContext#getMacroLibraries()
-     * @since 1.6
-     */
-    public List getMacroLibraries()
-    {
-        return icb.getMacroLibraries();
-    }
+//    /**
+//     * @see org.apache.velocity.context.InternalHousekeepingContext#getMacroLibraries()
+//     * @since 1.6
+//     */
+//    public List getMacroLibraries()
+//    {
+//        return icb.getMacroLibraries();
+//    }
 
     /* ---  Context interface methods --- */
 

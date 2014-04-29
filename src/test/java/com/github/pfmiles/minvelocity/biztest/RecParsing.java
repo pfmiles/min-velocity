@@ -18,7 +18,7 @@ package com.github.pfmiles.minvelocity.biztest;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.pfmiles.minvelocity.biztest.TemplateRenderUtil;
+import com.github.pfmiles.minvelocity.TemplateRenderUtil;
 
 /**
  * 用于在velocity中执行带调用栈的递归渲染的辅助类，支持以“串接”形式添加参数

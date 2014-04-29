@@ -6,6 +6,8 @@
 * 没有macro
 * 没有stop
 * 没有evaluate
+* 没有define
+* 没有break
 
 # 改动：
 * requires jdk1.5+
@@ -18,3 +20,7 @@
 
 # 改进：
 * TODO
+
+# TODO ：
+* parser pool或许应该去掉, 因为parser对象本身创建开销并不大
+* #parse和#include的模板查找路径是否需要调整成基于相对位置加载

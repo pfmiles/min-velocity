@@ -21,14 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.lang.StringUtils;
+
+import com.github.pfmiles.minvelocity.TemplateRenderUtil;
 
 /**
  * 根据apiMeta，生成业务sdk代码的util类
  * 
  * @author pf-miles 2014-4-10 下午3:53:12
  */
-public class ApiCodeGenUtil {
+public class ApiCodeGenUtilTest extends TestCase {
 
     /**
      * 根据meta信息和集群信息，生成业务sdk java源码
@@ -116,22 +120,28 @@ public class ApiCodeGenUtil {
         return ret;
     }
 
-    public static void main(String... args) throws IOException {
+    public void testBiz() throws IOException {
         // 测试生成主类:
         List<NsInfo> infos = new ArrayList<NsInfo>();
         infos.add(fakeNsInfo());
-        System.out.println(genApiFacade(infos, Site.CBU).getCharContent(true));
+        // System.out.println(genApiFacade(infos,
+        // Site.CBU).getCharContent(true));
+        assertTrue(genApiFacade(infos, Site.CBU).getCharContent(true) != null);
         // 测试生成参数类：
         List<NsInfo> infos1 = new ArrayList<NsInfo>();
         infos1.add(fakeNsInfo());
-        System.out.println(genParamPojos(infos1, Site.CBU).get(0).getCharContent(true));
+        // System.out.println(genParamPojos(infos1,
+        // Site.CBU).get(0).getCharContent(true));
+        assertTrue(genParamPojos(infos1, Site.CBU).get(0).getCharContent(true) != null);
         // 测试生成结果类：
         List<NsInfo> infos2 = new ArrayList<NsInfo>();
         infos2.add(fakeNsInfo());
         for (JavaSourceFile s : genResultPojos(infos2, Site.CBU)) {
             System.out.println(s.getName() + ": ");
-            System.out.println(s.getCharContent(true));
+            // System.out.println(s.getCharContent(true));
+            assertTrue(s.getCharContent(true) != null);
         }
+        assertTrue(true);
     }
 
     private static NsInfo fakeNsInfo() {

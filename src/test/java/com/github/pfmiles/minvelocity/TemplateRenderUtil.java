@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.github.pfmiles.minvelocity.biztest;
+package com.github.pfmiles.minvelocity;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -26,15 +26,11 @@ import java.util.Properties;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.github.pfmiles.minvelocity.biztest.BizUtil;
 import com.github.pfmiles.org.apache.velocity.VelocityContext;
 import com.github.pfmiles.org.apache.velocity.app.VelocityEngine;
 import com.github.pfmiles.org.apache.velocity.context.Context;
 
-/**
- * 渲染模板util, 用于根据业务数据和模板文件，生成java源码、pdf文档等
- * 
- * @author pf-miles 2014-4-10 上午11:42:34
- */
 public class TemplateRenderUtil {
 
     private static final Properties props = new Properties();
