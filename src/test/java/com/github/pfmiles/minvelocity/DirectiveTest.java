@@ -16,26 +16,26 @@ public class DirectiveTest extends TestCase {
         list.add("two");
         list.add("three");
         param.put("list", list);
-        String rst = TemplateRenderUtil.render("test/foreach.vm", param);
+        String rst = TemplateUtil.render("test/foreach.vm", param);
         assertTrue("one\ntwo\nthree\n".equals(rst));
     }
 
     public void testInclude() {
-        String rst = TemplateRenderUtil.render("test/include.vm", null);
+        String rst = TemplateUtil.render("test/include.vm", null);
         assertTrue("Not Included\nIncluded\nNot Included".equals(rst));
     }
 
     public void testParse() {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("name", "Miles");
-        String rst = TemplateRenderUtil.render("test/parse.vm", params);
+        String rst = TemplateUtil.render("test/parse.vm", params);
         assertTrue("My name is Miles!".equals(rst));
     }
 
     public void testRecParse() {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("num", 5);
-        String rst = TemplateRenderUtil.render("test/recParse.vm", params);
+        String rst = TemplateUtil.render("/test/recParse.vm", params);
         assertTrue("5!\n4!\n3!\n2!\n1!\nend!".equals(rst.trim()));
     }
 
@@ -46,8 +46,16 @@ public class DirectiveTest extends TestCase {
         list.add("two");
         list.add("three");
         param.put("boogie", list);
-        String rst = TemplateRenderUtil.render("test/literal.vm", param);
+        String rst = TemplateUtil.render("test/literal.vm", param);
         assertTrue("#foreach ($woogie in $boogie)\n    nothing will happen to $woogie\n#end".equals(rst.trim()));
+    }
+
+    // temp -> #parse -> ParseUtil -> #parse -> ParseUtil
+    public void testParseRecUtilParseRecUtil() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("hello", "world");
+        String rst = TemplateUtil.render("/test/parseRecUtils.vm", params);
+        assertTrue("world\nworld\nworld\nworld".equals(rst.trim()));
     }
 
 }

@@ -276,10 +276,12 @@ public class ResourceManagerImpl
      * @throws  ResourceNotFoundException  if template not found from any available source.
      * @throws  ParseErrorException  if template cannot be parsed due to syntax (or other) error.
      */
-    public Resource getResource(final String resourceName, final int resourceType, final String encoding)
+    public Resource getResource(String resourceName, final int resourceType, final String encoding)
         throws ResourceNotFoundException,
             ParseErrorException
     {
+        // 这里接收到的resourceName一定是绝对路径形式，一切的相对路径计算在之前应已完成
+        resourceName = normalizeThePath(resourceName);
         /*
          * Check to see if the resource was placed in the cache.
          * If it was placed in the cache then we will use
@@ -353,6 +355,7 @@ public class ResourceManagerImpl
 
                 if (resource.getResourceLoader().isCachingOn())
                 {
+                    if(log.isDebugEnabled()) log.debug("Resource " + resourceName + " cached with key: " + resourceKey);
                     globalCache.put(resourceKey, resource);
                 }
             }
@@ -375,6 +378,15 @@ public class ResourceManagerImpl
         }
 
         return resource;
+    }
+
+    // 为绝对路径加上"/"前缀
+    private String normalizeThePath(String resourceName) {
+        if(!resourceName.startsWith("/")){
+            return "/" + resourceName;
+        }else{
+            return resourceName;
+        }
     }
 
     /**

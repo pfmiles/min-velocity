@@ -187,14 +187,14 @@ public final class ${site.getMainClsName()} {
                 }
                 Map<String, Object> map = client.send(new Request("${ns.nsName}", "${api.apiName}", ${api.apiVer})#if(${api.needAuthorization}).setAccessToken(accessToken)#end
 
-                                                      #parse("sdkTemp/code/reqParamSettings.vm")
+                                                      #parse("reqParamSettings.vm")
                                                       , Map.class, reqPolicy);
-                #parse("sdkTemp/code/resultLocating.vm")
+                #parse("resultLocating.vm")
                 
                 $StringUtils.capitalize(${api.methodName})Result ret = new $StringUtils.capitalize(${api.methodName})Result();
                 #set($resultInfoEntries = ${api.resultInfo.entrySet()})
                 #set($mappingObjName = "ret")
-                #parse("sdkTemp/code/resultMapping.vm")
+                #parse("resultMapping.vm")
                 return ret;
             } catch (InterruptedException e) {
                 $StringUtils.capitalize(${api.methodName})Result ret = new $StringUtils.capitalize(${api.methodName})Result();

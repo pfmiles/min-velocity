@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.github.pfmiles.minvelocity.biztest;
+package com.github.pfmiles.minvelocity;
 
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 实现一些业务方法，方便模板渲染时调用
+ * 用于在velocity中执行带调用栈的递归渲染的辅助类，支持以“串接”形式添加参数
  * 
- * @author pf-miles 2014-4-15 下午2:42:49
+ * @author pf-miles 2014-4-15 下午5:20:34
  */
-public class BizUtil {
+public class RecParsing {
 
-    /**
-     * 支持带调用栈(即每层递归调用的context彼此隔离)的parse,
-     * 当需要在递归parse过程中保持调用栈时可用于代替velocity中原本的#parse directive
-     */
-    public static RecParsing recParsing(String tempPath) {
-        return new RecParsing(tempPath);
+    private Map<String, Object> ctx = new HashMap<String, Object>();
+    private String              tempPath;
+
+    public RecParsing(String tempPath){
+        this.tempPath = tempPath;
     }
+
+    public RecParsing addParam(String key, Object value) {
+        ctx.put(key, value);
+        return this;
+    }
+
+    public String toString() {
+        return TemplateUtil.render(tempPath, ctx);
+    }
+
 }

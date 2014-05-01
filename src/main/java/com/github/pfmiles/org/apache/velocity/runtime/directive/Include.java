@@ -219,7 +219,6 @@ public class Include extends InputBase
          *  check to see if the argument will be changed by the event handler
          */
 
-//        String arg = EventHandlerUtil.includeEvent( rsvc, context, sourcearg, context.getCurrentTemplateName(), getName() );
         String arg = sourcearg;
 
         /*
@@ -235,7 +234,8 @@ public class Include extends InputBase
         try
         {
             if (!blockinput)
-                resource = rsvc.getContent(arg, getInputEncoding(context));
+//                resource = rsvc.getContent(arg, getInputEncoding(context));
+                resource = rsvc.getCttSupportRelPath(arg, getInputEncoding(context), this.getTemplateName());
         }
         catch ( ResourceNotFoundException rnfe )
         {

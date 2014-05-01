@@ -5,7 +5,7 @@
         #set($pojoClsName = ${entry.value.attClsName})
         #set($pojoName = "$StringUtils.uncapitalize(${pojoClsName})Var")
         ${pojoClsName} ${pojoName} = new ${pojoClsName}();
-        $BizUtil.recParsing("sdkTemp/code/resultMapping.vm").addParam("mappingObjName", ${pojoName}).addParam("resultInfoEntries", ${entry.value.entrySet()})
+        $ParseUtil.recParsing("resultMapping.vm").addParam("mappingObjName", ${pojoName}).addParam("resultInfoEntries", ${entry.value.entrySet()})
         ${mappingObjName}.set$StringUtils.capitalize(${entry.key})(${pojoName});
     #end
 

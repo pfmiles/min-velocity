@@ -1,7 +1,7 @@
 #if($num > 0)
 ${num}!
 #set($num = $num - 1)
-$BizUtil.recParsing("test/recParse.vm").addParam("num", $num)
+$ParseUtil.recParsing("recParse.vm").addParam("num", $num)
 #else
 end!
 #end

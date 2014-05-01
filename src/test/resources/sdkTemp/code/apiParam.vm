@@ -17,6 +17,6 @@ public class $StringUtils.capitalize(${api.methodName})Param {
     #end
     
     #set($toStrAttrs = ${api.paramInfo.entrySet()})
-    #parse("sdkTemp/code/toStringJson.vm")
+    #parse("toStringJson.vm")
 
 }

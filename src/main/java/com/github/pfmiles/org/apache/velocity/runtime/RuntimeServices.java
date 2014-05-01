@@ -36,6 +36,7 @@ import com.github.pfmiles.org.apache.velocity.runtime.parser.Parser;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.node.Node;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.node.SimpleNode;
 import com.github.pfmiles.org.apache.velocity.runtime.resource.ContentResource;
+import com.github.pfmiles.org.apache.velocity.runtime.resource.Resource;
 import com.github.pfmiles.org.apache.velocity.util.introspection.Introspector;
 import com.github.pfmiles.org.apache.velocity.util.introspection.Uberspect;
 
@@ -186,69 +187,6 @@ public interface RuntimeServices
         throws ParseException;
 
     /**
-     * Renders the input string using the context into the output writer.
-     * To be used when a template is dynamically constructed, or want to use
-     * Velocity as a token replacer.
-     *
-     * @param context context to use in rendering input string
-     * @param out  Writer in which to render the output
-     * @param logTag  string to be used as the template name for log
-     *                messages in case of error
-     * @param instring input string containing the VTL to be rendered
-     *
-     * @return true if successful, false otherwise.  If false, see
-     *              Velocity runtime log
-     * @throws ParseErrorException The template could not be parsed.
-     * @throws MethodInvocationException A method on a context object could not be invoked.
-     * @throws ResourceNotFoundException A referenced resource could not be loaded.
-     * @throws IOException While rendering to the writer, an I/O problem occured.
-     * @since Velocity 1.6
-     */
-    public boolean evaluate(Context context, Writer out,
-                            String logTag, String instring);
-
-    /**
-     * Renders the input reader using the context into the output writer.
-     * To be used when a template is dynamically constructed, or want to
-     * use Velocity as a token replacer.
-     *
-     * @param context context to use in rendering input string
-     * @param writer  Writer in which to render the output
-     * @param logTag  string to be used as the template name for log messages
-     *                in case of error
-     * @param reader Reader containing the VTL to be rendered
-     *
-     * @return true if successful, false otherwise.  If false, see
-     *              Velocity runtime log
-     * @throws ParseErrorException The template could not be parsed.
-     * @throws MethodInvocationException A method on a context object could not be invoked.
-     * @throws ResourceNotFoundException A referenced resource could not be loaded.
-     * @since Velocity 1.6
-     */
-    public boolean evaluate(Context context, Writer writer,
-                            String logTag, Reader reader);
-
-    /**
-     * Invokes a currently registered Velocimacro with the params provided
-     * and places the rendered stream into the writer.
-     * <br>
-     * Note : currently only accepts args to the VM if they are in the context.
-     *
-     * @param vmName name of Velocimacro to call
-     * @param logTag string to be used for template name in case of error. if null,
-     *               the vmName will be used
-     * @param params keys for args used to invoke Velocimacro, in java format
-     *               rather than VTL (eg  "foo" or "bar" rather than "$foo" or "$bar")
-     * @param context Context object containing data/objects used for rendering.
-     * @param writer  Writer for output stream
-     * @return true if Velocimacro exists and successfully invoked, false otherwise.
-     * @since 1.6
-     */
-    public boolean invokeVelocimacro(final String vmName, String logTag,
-                                     String[] params, final Context context,
-                                     final Writer writer);
-
-    /**
      * Returns a <code>Template</code> from the resource manager.
      * This method assumes that the character encoding of the
      * template is set by the <code>input.encoding</code>
@@ -327,88 +265,6 @@ public interface RuntimeServices
      * @return String  value of key or default
      */
     public String getString( String key, String defaultValue);
-
-    /**
-     * Returns the appropriate VelocimacroProxy object if strVMname
-     * is a valid current Velocimacro.
-     *
-     * @param vmName  Name of velocimacro requested
-     * @param templateName Name of the namespace.
-     * @return VelocimacroProxy
-     */
-    public Directive getVelocimacro( String vmName, String templateName  );
-    
-    /**
-     * Returns the appropriate VelocimacroProxy object if strVMname
-     * is a valid current Velocimacro.
-     *
-     * @param vmName  Name of velocimacro requested
-     * @param templateName Name of the namespace.
-     * @param renderingTemplate Name of the template we are currently rendering. This
-     *    information is needed when VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL setting is true
-     *    and template contains a macro with the same name as the global macro library.
-     * 
-     * @since Velocity 1.6
-     * 
-     * @return VelocimacroProxy
-     */
-    public Directive getVelocimacro( String vmName, String templateName, String renderingTemplate  );
-
-   /**
-     * Adds a new Velocimacro. Usually called by Macro only while parsing.
-     *
-     * @param name  Name of velocimacro
-     * @param macro  String form of macro body
-     * @param argArray  Array of strings, containing the
-     *                         #macro() arguments.  the 0th is the name.
-     * @param sourceTemplate
-     * 
-     * @deprecated Use addVelocimacro(String, Node, String[], String) instead
-     *                   
-     * @return boolean  True if added, false if rejected for some
-     *                  reason (either parameters or permission settings)
-     */
-//    public boolean addVelocimacro( String name,
-//                                          String macro,
-//                                          String argArray[],
-//                                          String sourceTemplate );
-
-    /**
-     * Adds a new Velocimacro. Usually called by Macro only while parsing.
-     *
-     * @param name  Name of velocimacro
-     * @param macro  root AST node of the parsed macro
-     * @param argArray  Array of strings, containing the
-     *                         #macro() arguments.  the 0th is the name.
-     * @param sourceTemplate
-     * 
-     * @since Velocity 1.6
-     *                   
-     * @return boolean  True if added, false if rejected for some
-     *                  reason (either parameters or permission settings)
-     */
-//    public boolean addVelocimacro( String name,
-//                                          Node macro,
-//                                          String argArray[],
-//                                          String sourceTemplate );
-                                          
-                                          
-    /**
-     *  Checks to see if a VM exists
-     *
-     * @param vmName  Name of velocimacro
-     * @param templateName
-     * @return boolean  True if VM by that name exists, false if not
-     */
-//    public boolean isVelocimacro( String vmName, String templateName );
-
-    /**
-     *  tells the vmFactory to dump the specified namespace.  This is to support
-     *  clearing the VM list when in inline-VM-local-scope mode
-     * @param namespace
-     * @return True if the Namespace was dumped.
-     */
-//    public boolean dumpVMNamespace( String namespace );
 
     /**
      * String property accessor method to hide the configuration implementation
@@ -515,5 +371,23 @@ public interface RuntimeServices
      * @since 1.6
      */
     public Directive getDirective(String name);
+
+    /**
+     * 同'getTemplate(String arg, String inputEncoding)', 但支持相对路径查找资源
+     * @param name 目标路径
+     * @param inputEncoding
+     * @param curPath 当前基准路径
+     * @return 
+     */
+    public Template getTempSupportRelPath(String name, String inputEncoding, String curPath);
+
+    /**
+     * 同'getContent(String arg, String inputEncoding)', 但支持相对路径查找资源
+     * @param name 目标路径
+     * @param inputEncoding
+     * @param curPath 当前基准路径
+     * @return
+     */
+    public Resource getCttSupportRelPath(String name, String inputEncoding, String curPath);
 
 }

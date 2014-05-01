@@ -165,7 +165,7 @@ public class ASTStringLiteral extends SimpleNode
              */
 
             String templateName =
-                (context != null) ? context.getCurrentTemplateName() : "StringLiteral";
+                (context != null) ? this.getTemplateName() : "StringLiteral";
             try
             {
                 nodeTree = rsvc.parse(br, templateName, false);

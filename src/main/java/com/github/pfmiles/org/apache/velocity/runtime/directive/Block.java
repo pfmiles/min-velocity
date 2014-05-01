@@ -112,10 +112,10 @@ public abstract class Block extends Directive
     {
         StrBuilder str = new StrBuilder(100)
             .append("block $").append(key);
-        if (!context.getCurrentTemplateName().equals(getTemplateName()))
-        {
-            str.append(" used in ").append(context.getCurrentTemplateName());
-        }
+//        if (!context.getCurrentTemplateName().equals(getTemplateName()))
+//        {
+//            str.append(" used in ").append(context.getCurrentTemplateName());
+//        }
         return str.toString();
     }
     

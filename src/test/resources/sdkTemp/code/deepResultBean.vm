@@ -27,6 +27,6 @@ public class ${deepInfo.attClsName} {
     #end
 
     #set($toStrAttrs = ${deepInfo.entrySet()})
-    #parse("sdkTemp/code/toStringJson.vm")
+    #parse("toStringJson.vm")
 
 }

@@ -31,8 +31,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
+import com.github.pfmiles.minvelocity.ImplHelper;
 import com.github.pfmiles.org.apache.commons.collections.ExtendedProperties;
-import com.github.pfmiles.org.apache.commons.lang.text.StrBuilder;
 import com.github.pfmiles.org.apache.velocity.Template;
 import com.github.pfmiles.org.apache.velocity.context.Context;
 import com.github.pfmiles.org.apache.velocity.context.InternalContextAdapterImpl;
@@ -42,13 +42,13 @@ import com.github.pfmiles.org.apache.velocity.exception.ResourceNotFoundExceptio
 import com.github.pfmiles.org.apache.velocity.exception.TemplateInitException;
 import com.github.pfmiles.org.apache.velocity.exception.VelocityException;
 import com.github.pfmiles.org.apache.velocity.runtime.directive.Directive;
-import com.github.pfmiles.org.apache.velocity.runtime.directive.Scope;
 import com.github.pfmiles.org.apache.velocity.runtime.log.Log;
 import com.github.pfmiles.org.apache.velocity.runtime.log.LogManager;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.ParseException;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.Parser;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.node.SimpleNode;
 import com.github.pfmiles.org.apache.velocity.runtime.resource.ContentResource;
+import com.github.pfmiles.org.apache.velocity.runtime.resource.Resource;
 import com.github.pfmiles.org.apache.velocity.runtime.resource.ResourceManager;
 import com.github.pfmiles.org.apache.velocity.util.ClassUtils;
 import com.github.pfmiles.org.apache.velocity.util.RuntimeServicesAware;
@@ -104,6 +104,7 @@ import com.github.pfmiles.org.apache.velocity.util.introspection.UberspectLoggab
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:jlb@houseofdistraction.com">Jeff Bowden</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magusson Jr.</a>
+ * @author pf-miles
  * @version $Id: RuntimeInstance.java 898050 2010-01-11 20:15:31Z nbubna $
  */
 public class RuntimeInstance implements RuntimeConstants, RuntimeServices
@@ -121,10 +122,10 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
      */
     private Log log = new Log();
 
-    /**
-     * The Runtime parser pool
-     */
-    private  ParserPool parserPool;
+//    /**
+//     * The Runtime parser pool
+//     */
+//    private  ParserPool parserPool;
 
     /**
      * Indicate whether the Runtime is in the midst of initialization.
@@ -187,11 +188,11 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
      */
     private Introspector introspector = null;
 
-    /*
-     * Settings for provision of root scope for evaluate(...) calls.
-     */
-    private String evaluateScopeName = "evaluate";
-    private boolean provideEvaluateScope = false;
+//    /*
+//     * Settings for provision of root scope for evaluate(...) calls.
+//     */
+//    private String evaluateScopeName = "evaluate";
+//    private boolean provideEvaluateScope = false;
 
     /*
      *  Opaque reference to something specificed by the
@@ -254,10 +255,10 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
             initializeResourceManager();
             initializeDirectives();
 //            initializeEventHandlers();
-            initializeParserPool();
+//            initializeParserPool();
 
             initializeIntrospection();
-            initializeEvaluateScopeSettings();
+//            initializeEvaluateScopeSettings();
             /*
              *  initialize the VM Factory.  It will use the properties
              * accessable from Runtime, so keep this here at the end.
@@ -1038,76 +1039,76 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     }
 
 
-    /**
-     * Initializes the Velocity parser pool.
-     */
-    private void initializeParserPool()
-    {
-        /*
-         * Which parser pool?
-         */
-        String pp = getString(RuntimeConstants.PARSER_POOL_CLASS);
-
-        if (pp != null && pp.length() > 0)
-        {
-            /*
-             *  if something was specified, then make one.
-             *  if that isn't a ParserPool, consider
-             *  this a huge error and throw
-             */
-
-            Object o = null;
-
-            try
-            {
-                o = ClassUtils.getNewInstance( pp );
-            }
-            catch (ClassNotFoundException cnfe )
-            {
-                String err = "The specified class for ParserPool ("
-                    + pp
-                    + ") does not exist (or is not accessible to the current classloader.";
-                log.error(err);
-                throw new VelocityException(err, cnfe);
-            }
-            catch (InstantiationException ie)
-            {
-              throw new VelocityException("Could not instantiate class '" + pp + "'", ie);
-            }
-            catch (IllegalAccessException ae)
-            {
-              throw new VelocityException("Cannot access class '" + pp + "'", ae);
-            }
-
-            if (!(o instanceof ParserPool))
-            {
-                String err = "The specified class for ParserPool ("
-                    + pp + ") does not implement " + ParserPool.class
-                    + " Velocity not initialized correctly.";
-
-                log.error(err);
-                throw new VelocityException(err);
-            }
-
-            parserPool = (ParserPool) o;
-
-            parserPool.initialize(this);
-        }
-        else
-        {
-            /*
-             *  someone screwed up.  Lets not fool around...
-             */
-
-            String err = "It appears that no class was specified as the"
-                + " ParserPool.  Please ensure that all configuration"
-                + " information is correct.";
-
-            log.error(err);
-            throw new VelocityException( err );
-        }
-
-    }
+//    /**
+//     * Initializes the Velocity parser pool.
+//     */
+//    private void initializeParserPool()
+//    {
+//        /*
+//         * Which parser pool?
+//         */
+//        String pp = getString(RuntimeConstants.PARSER_POOL_CLASS);
+//
+//        if (pp != null && pp.length() > 0)
+//        {
+//            /*
+//             *  if something was specified, then make one.
+//             *  if that isn't a ParserPool, consider
+//             *  this a huge error and throw
+//             */
+//
+//            Object o = null;
+//
+//            try
+//            {
+//                o = ClassUtils.getNewInstance( pp );
+//            }
+//            catch (ClassNotFoundException cnfe )
+//            {
+//                String err = "The specified class for ParserPool ("
+//                    + pp
+//                    + ") does not exist (or is not accessible to the current classloader.";
+//                log.error(err);
+//                throw new VelocityException(err, cnfe);
+//            }
+//            catch (InstantiationException ie)
+//            {
+//              throw new VelocityException("Could not instantiate class '" + pp + "'", ie);
+//            }
+//            catch (IllegalAccessException ae)
+//            {
+//              throw new VelocityException("Cannot access class '" + pp + "'", ae);
+//            }
+//
+//            if (!(o instanceof ParserPool))
+//            {
+//                String err = "The specified class for ParserPool ("
+//                    + pp + ") does not implement " + ParserPool.class
+//                    + " Velocity not initialized correctly.";
+//
+//                log.error(err);
+//                throw new VelocityException(err);
+//            }
+//
+//            parserPool = (ParserPool) o;
+//
+//            parserPool.initialize(this);
+//        }
+//        else
+//        {
+//            /*
+//             *  someone screwed up.  Lets not fool around...
+//             */
+//
+//            String err = "It appears that no class was specified as the"
+//                + " ParserPool.  Please ensure that all configuration"
+//                + " information is correct.";
+//
+//            log.error(err);
+//            throw new VelocityException( err );
+//        }
+//
+//    }
 
     /**
      * Returns a JavaCC generated Parser.
@@ -1186,25 +1187,26 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     {
         requireInitialization();
 
-        Parser parser = (Parser) parserPool.get();
-        boolean keepParser = true;
+        Parser parser = this.createNewParser();
+//        boolean keepParser = true;
         if (parser == null)
         {
+            throw new RuntimeException("Create parser instance failed.");
             /*
              *  if we couldn't get a parser from the pool make one and log it.
              */
-            if (log.isInfoEnabled())
-            {
-                log.info("Runtime : ran out of parsers. Creating a new one. "
-                      + " Please increment the parser.pool.size property."
-                      + " The current value is too small.");
-            }
-            parser = createNewParser();
-            keepParser = false;
+//            if (log.isInfoEnabled())
+//            {
+//                log.info("Runtime : ran out of parsers. Creating a new one. "
+//                      + " Please increment the parser.pool.size property."
+//                      + " The current value is too small.");
+//            }
+//            parser = createNewParser();
+//            keepParser = false;
         }
 
-        try
-        {
+//        try
+//        {
             /*
              *  dump namespace if we are told to.  Generally, you want to
              *  do this - you don't in special circumstances, such as
@@ -1215,96 +1217,96 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
 //                dumpVMNamespace(templateName);
 //            }
             return parser.parse(reader, templateName);
-        }
-        finally
-        {
-            if (keepParser)
-            {
-                parserPool.put(parser);
-            }
-
-        }
+//        }
+//        finally
+//        {
+//            if (keepParser)
+//            {
+//                parserPool.put(parser);
+//            }
+//
+//        }
     }
 
-    private void initializeEvaluateScopeSettings()
-    {
-        String property = evaluateScopeName+'.'+PROVIDE_SCOPE_CONTROL;
-        provideEvaluateScope = getBoolean(property, provideEvaluateScope);
-    }
+//    private void initializeEvaluateScopeSettings()
+//    {
+//        String property = evaluateScopeName+'.'+PROVIDE_SCOPE_CONTROL;
+//        provideEvaluateScope = getBoolean(property, provideEvaluateScope);
+//    }
 
-    /**
-     * Renders the input string using the context into the output writer.
-     * To be used when a template is dynamically constructed, or want to use
-     * Velocity as a token replacer.
-     *
-     * @param context context to use in rendering input string
-     * @param out  Writer in which to render the output
-     * @param logTag  string to be used as the template name for log
-     *                messages in case of error
-     * @param instring input string containing the VTL to be rendered
-     *
-     * @return true if successful, false otherwise.  If false, see
-     *              Velocity runtime log
-     * @throws ParseErrorException The template could not be parsed.
-     * @throws MethodInvocationException A method on a context object could not be invoked.
-     * @throws ResourceNotFoundException A referenced resource could not be loaded.
-     * @since Velocity 1.6
-     */
-    public boolean evaluate(Context context,  Writer out,
-                            String logTag, String instring)
-    {
-        return evaluate(context, out, logTag, new StringReader(instring));
-    }
-
-    /**
-     * Renders the input reader using the context into the output writer.
-     * To be used when a template is dynamically constructed, or want to
-     * use Velocity as a token replacer.
-     *
-     * @param context context to use in rendering input string
-     * @param writer  Writer in which to render the output
-     * @param logTag  string to be used as the template name for log messages
-     *                in case of error
-     * @param reader Reader containing the VTL to be rendered
-     *
-     * @return true if successful, false otherwise.  If false, see
-     *              Velocity runtime log
-     * @throws ParseErrorException The template could not be parsed.
-     * @throws MethodInvocationException A method on a context object could not be invoked.
-     * @throws ResourceNotFoundException A referenced resource could not be loaded.
-     * @since Velocity 1.6
-     */
-    public boolean evaluate(Context context, Writer writer,
-                            String logTag, Reader reader)
-    {
-        if (logTag == null)
-        {
-            throw new NullPointerException("logTag (i.e. template name) cannot be null, you must provide an identifier for the content being evaluated");
-        }
-
-        SimpleNode nodeTree = null;
-        try
-        {
-            nodeTree = parse(reader, logTag);
-        }
-        catch (ParseException pex)
-        {
-            throw new ParseErrorException(pex, null);
-        }
-        catch (TemplateInitException pex)
-        {
-            throw new ParseErrorException(pex, null);
-        }
-
-        if (nodeTree == null)
-        {
-            return false;
-        }
-        else
-        {
-            return render(context, writer, logTag, nodeTree);
-        }
-    }
+//    /**
+//     * Renders the input string using the context into the output writer.
+//     * To be used when a template is dynamically constructed, or want to use
+//     * Velocity as a token replacer.
+//     *
+//     * @param context context to use in rendering input string
+//     * @param out  Writer in which to render the output
+//     * @param logTag  string to be used as the template name for log
+//     *                messages in case of error
+//     * @param instring input string containing the VTL to be rendered
+//     *
+//     * @return true if successful, false otherwise.  If false, see
+//     *              Velocity runtime log
+//     * @throws ParseErrorException The template could not be parsed.
+//     * @throws MethodInvocationException A method on a context object could not be invoked.
+//     * @throws ResourceNotFoundException A referenced resource could not be loaded.
+//     * @since Velocity 1.6
+//     */
+//    public boolean evaluate(Context context,  Writer out,
+//                            String logTag, String instring)
+//    {
+//        return evaluate(context, out, logTag, new StringReader(instring));
+//    }
+//
+//    /**
+//     * Renders the input reader using the context into the output writer.
+//     * To be used when a template is dynamically constructed, or want to
+//     * use Velocity as a token replacer.
+//     *
+//     * @param context context to use in rendering input string
+//     * @param writer  Writer in which to render the output
+//     * @param logTag  string to be used as the template name for log messages
+//     *                in case of error
+//     * @param reader Reader containing the VTL to be rendered
+//     *
+//     * @return true if successful, false otherwise.  If false, see
+//     *              Velocity runtime log
+//     * @throws ParseErrorException The template could not be parsed.
+//     * @throws MethodInvocationException A method on a context object could not be invoked.
+//     * @throws ResourceNotFoundException A referenced resource could not be loaded.
+//     * @since Velocity 1.6
+//     */
+//    public boolean evaluate(Context context, Writer writer,
+//                            String logTag, Reader reader)
+//    {
+//        if (logTag == null)
+//        {
+//            throw new NullPointerException("logTag (i.e. template name) cannot be null, you must provide an identifier for the content being evaluated");
+//        }
+//
+//        SimpleNode nodeTree = null;
+//        try
+//        {
+//            nodeTree = parse(reader, logTag);
+//        }
+//        catch (ParseException pex)
+//        {
+//            throw new ParseErrorException(pex, null);
+//        }
+//        catch (TemplateInitException pex)
+//        {
+//            throw new ParseErrorException(pex, null);
+//        }
+//
+//        if (nodeTree == null)
+//        {
+//            return false;
+//        }
+//        else
+//        {
+//            return render(context, writer, logTag, nodeTree);
+//        }
+//    }
 
 
     /**
@@ -1359,15 +1361,15 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
                 throw new VelocityException(msg, e);
             }
 
-            try
-            {
-                if (provideEvaluateScope)
-                {
-                    Object previous = ica.get(evaluateScopeName);
-                    context.put(evaluateScopeName, new Scope(this, previous));
-                }
-                nodeTree.render(ica, writer);
-            }
+//            try
+//            {
+//                if (provideEvaluateScope)
+//                {
+//                    Object previous = ica.get(evaluateScopeName);
+//                    context.put(evaluateScopeName, new Scope(this, previous));
+//                }
+//                nodeTree.render(ica, writer);
+//            }
 //            catch (StopCommand stop)
 //            {
 //                if (!stop.isFor(this))
@@ -1379,99 +1381,99 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
 //                    getLog().debug(stop.getMessage());
 //                }
 //            }
-            catch (IOException e)
-            {
-                throw new VelocityException("IO Error in writer: " + e.getMessage(), e);
-            }
+//            catch (IOException e)
+//            {
+//                throw new VelocityException("IO Error in writer: " + e.getMessage(), e);
+//            }
         }
         finally
         {
             ica.popCurrentTemplateName();
-            if (provideEvaluateScope)
-            {
-                Object obj = ica.get(evaluateScopeName);
-                if (obj instanceof Scope)
-                {
-                    Scope scope = (Scope)obj;
-                    if (scope.getParent() != null)
-                    {
-                        ica.put(evaluateScopeName, scope.getParent());
-                    }
-                    else if (scope.getReplaced() != null)
-                    {
-                        ica.put(evaluateScopeName, scope.getReplaced());
-                    }
-                    else
-                    {
-                        ica.remove(evaluateScopeName);
-                    }
-                }
-            }
+//            if (provideEvaluateScope)
+//            {
+//                Object obj = ica.get(evaluateScopeName);
+//                if (obj instanceof Scope)
+//                {
+//                    Scope scope = (Scope)obj;
+//                    if (scope.getParent() != null)
+//                    {
+//                        ica.put(evaluateScopeName, scope.getParent());
+//                    }
+//                    else if (scope.getReplaced() != null)
+//                    {
+//                        ica.put(evaluateScopeName, scope.getReplaced());
+//                    }
+//                    else
+//                    {
+//                        ica.remove(evaluateScopeName);
+//                    }
+//                }
+//            }
         }
 
         return true;
     }
 
-    /**
-     * Invokes a currently registered Velocimacro with the params provided
-     * and places the rendered stream into the writer.
-     * <br>
-     * Note : currently only accepts args to the VM if they are in the context.
-     *
-     * @param vmName name of Velocimacro to call
-     * @param logTag string to be used for template name in case of error. if null,
-     *               the vmName will be used
-     * @param params keys for args used to invoke Velocimacro, in java format
-     *               rather than VTL (eg  "foo" or "bar" rather than "$foo" or "$bar")
-     * @param context Context object containing data/objects used for rendering.
-     * @param writer  Writer for output stream
-     * @return true if Velocimacro exists and successfully invoked, false otherwise.
-     * @since 1.6
-     */
-    public boolean invokeVelocimacro(final String vmName, String logTag,
-                                     String[] params, final Context context,
-                                     final Writer writer)
-     {
-        /* check necessary parameters */
-        if (vmName == null || context == null || writer == null)
-        {
-            String msg = "RuntimeInstance.invokeVelocimacro() : invalid call : vmName, context, and writer must not be null";
-            getLog().error(msg);
-            throw new NullPointerException(msg);
-        }
-
-        /* handle easily corrected parameters */
-        if (logTag == null)
-        {
-            logTag = vmName;
-        }
-        if (params == null)
-        {
-            params = new String[0];
-        }
-
-        /* does the VM exist? */
-//        if (!isVelocimacro(vmName, logTag))
+//    /**
+//     * Invokes a currently registered Velocimacro with the params provided
+//     * and places the rendered stream into the writer.
+//     * <br>
+//     * Note : currently only accepts args to the VM if they are in the context.
+//     *
+//     * @param vmName name of Velocimacro to call
+//     * @param logTag string to be used for template name in case of error. if null,
+//     *               the vmName will be used
+//     * @param params keys for args used to invoke Velocimacro, in java format
+//     *               rather than VTL (eg  "foo" or "bar" rather than "$foo" or "$bar")
+//     * @param context Context object containing data/objects used for rendering.
+//     * @param writer  Writer for output stream
+//     * @return true if Velocimacro exists and successfully invoked, false otherwise.
+//     * @since 1.6
+//     */
+//    public boolean invokeVelocimacro(final String vmName, String logTag,
+//                                     String[] params, final Context context,
+//                                     final Writer writer)
+//     {
+//        /* check necessary parameters */
+//        if (vmName == null || context == null || writer == null)
 //        {
-//            String msg = "RuntimeInstance.invokeVelocimacro() : VM '" + vmName
-//                         + "' is not registered.";
+//            String msg = "RuntimeInstance.invokeVelocimacro() : invalid call : vmName, context, and writer must not be null";
 //            getLog().error(msg);
-//            throw new VelocityException(msg);
+//            throw new NullPointerException(msg);
 //        }
-
-        /* now just create the VM call, and use evaluate */
-        StrBuilder template = new StrBuilder("#");
-        template.append(vmName);
-        template.append("(");
-        for( int i = 0; i < params.length; i++)
-        {
-            template.append(" $");
-            template.append(params[i]);
-        }
-        template.append(" )");
-
-        return evaluate(context, writer, logTag, template.toString());
-    }
+//
+//        /* handle easily corrected parameters */
+//        if (logTag == null)
+//        {
+//            logTag = vmName;
+//        }
+//        if (params == null)
+//        {
+//            params = new String[0];
+//        }
+//
+//        /* does the VM exist? */
+////        if (!isVelocimacro(vmName, logTag))
+////        {
+////            String msg = "RuntimeInstance.invokeVelocimacro() : VM '" + vmName
+////                         + "' is not registered.";
+////            getLog().error(msg);
+////            throw new VelocityException(msg);
+////        }
+//
+//        /* now just create the VM call, and use evaluate */
+//        StrBuilder template = new StrBuilder("#");
+//        template.append(vmName);
+//        template.append("(");
+//        for( int i = 0; i < params.length; i++)
+//        {
+//            template.append(" $");
+//            template.append(params[i]);
+//        }
+//        template.append(" )");
+//
+//        return evaluate(context, writer, logTag, template.toString());
+//    }
 
     /**
      * Retrieves and caches the configured default encoding
@@ -1652,112 +1654,6 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
         return configuration.getString(key, defaultValue);
     }
 
-    /**
-     * Returns the appropriate VelocimacroProxy object if vmName
-     * is a valid current Velocimacro.
-     *
-     * @param vmName Name of velocimacro requested
-     * @param templateName Name of the template that contains the velocimacro.
-     * @return The requested VelocimacroProxy.
-     * @since 1.6
-     */
-    public Directive getVelocimacro(String vmName, String templateName)
-    {
-//        return vmFactory.getVelocimacro( vmName, templateName );
-        return null;
-    }
-
-    /**
-     * Returns the appropriate VelocimacroProxy object if vmName
-     * is a valid current Velocimacro.
-     *
-     * @param vmName  Name of velocimacro requested
-     * @param templateName Name of the namespace.
-     * @param renderingTemplate Name of the template we are currently rendering. This
-     *    information is needed when VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL setting is true
-     *    and template contains a macro with the same name as the global macro library.
-     * 
-     * @since Velocity 1.6
-     * 
-     * @return VelocimacroProxy
-     */
-    public Directive getVelocimacro(String vmName, String templateName, String renderingTemplate)
-    {
-//        return vmFactory.getVelocimacro( vmName, templateName, renderingTemplate );
-        return null;
-    }
-    
-    
-   /**
-    * Adds a new Velocimacro. Usually called by Macro only while parsing.
-    *
-    * @param name Name of velocimacro
-    * @param macro String form of macro body
-    * @param argArray Array of strings, containing the
-    *                         #macro() arguments.  the 0th is the name.
-    * @param sourceTemplate Name of the template that contains the velocimacro.
-    * 
-    * @deprecated Use addVelocimacro(String, Node, String[], String) instead
-    * 
-    * @return True if added, false if rejected for some
-    *                  reason (either parameters or permission settings)
-    */
-//    public boolean addVelocimacro( String name,
-//                                          String macro,
-//                                          String argArray[],
-//                                          String sourceTemplate )
-//    {
-//        return vmFactory.addVelocimacro(name.intern(), macro,  argArray,  sourceTemplate);
-//    }
-
-    /**
-     * Adds a new Velocimacro. Usually called by Macro only while parsing.
-     * 
-     * Called by org.apache.velocity.runtime.directive.processAndRegister
-     *
-     * @param name  Name of velocimacro
-     * @param macro  root AST node of the parsed macro
-     * @param argArray  Array of strings, containing the
-     *                         #macro() arguments.  the 0th is the name.
-     * @param sourceTemplate
-     * 
-     * @since Velocity 1.6
-     *                   
-     * @return boolean  True if added, false if rejected for some
-     *                  reason (either parameters or permission settings)
-     */
-//    public boolean addVelocimacro( String name,
-//                                          Node macro,
-//                                          String argArray[],
-//                                          String sourceTemplate )
-//    {
-//        return vmFactory.addVelocimacro(name.intern(), macro,  argArray,  sourceTemplate);
-//    }
-    
-    
-    /**
-     *  Checks to see if a VM exists
-     *
-     * @param vmName Name of the Velocimacro.
-     * @param templateName Template on which to look for the Macro.
-     * @return True if VM by that name exists, false if not
-     */
-//    public boolean isVelocimacro( String vmName, String templateName )
-//    {
-//        return vmFactory.isVelocimacro(vmName.intern(), templateName);
-//    }
-
-    /**
-     * tells the vmFactory to dump the specified namespace.  This is to support
-     * clearing the VM list when in inline-VM-local-scope mode
-     * @param namespace Namespace to dump.
-     * @return True if namespace was dumped successfully.
-     */
-//    public boolean dumpVMNamespace(String namespace)
-//    {
-//        return vmFactory.dumpVMNamespace( namespace );
-//    }
-
     /* --------------------------------------------------------------------
      * R U N T I M E  A C C E S S O R  M E T H O D S
      * --------------------------------------------------------------------
@@ -1877,6 +1773,31 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     public Uberspect getUberspect()
     {
         return uberSpect;
+    }
+
+    public Template getTempSupportRelPath(String name, String inputEncoding, String curPath) {
+        if(name.startsWith("/")){
+            // 绝对路径
+            return this.getTemplate(name, inputEncoding);
+        }else{
+            // 相对路径
+            return this.getTemplate(ImplHelper.resolveAbsName(name, curPath), inputEncoding);
+        }
+    }
+
+    public Resource getCttSupportRelPath(String name, String inputEncoding, String curPath) {
+        if(name.startsWith("/")){
+            // 绝对路径
+            return this.getContent(name, inputEncoding);
+        }else{
+            // 相对路径
+            return this.getContent(ImplHelper.resolveAbsName(name, curPath), inputEncoding);
+        }
+    }
+
+    public void init(ExtendedProperties props) {
+        setProperties(props);
+        init();
     }
 
 }

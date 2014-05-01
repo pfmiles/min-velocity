@@ -21,16 +21,14 @@ package com.github.pfmiles.org.apache.velocity.runtime.directive;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
-import java.util.ArrayList;
 
 import com.github.pfmiles.org.apache.velocity.Template;
 import com.github.pfmiles.org.apache.velocity.context.InternalContextAdapter;
 import com.github.pfmiles.org.apache.velocity.exception.MethodInvocationException;
 import com.github.pfmiles.org.apache.velocity.exception.ParseErrorException;
 import com.github.pfmiles.org.apache.velocity.exception.ResourceNotFoundException;
-import com.github.pfmiles.org.apache.velocity.exception.VelocityException;
 import com.github.pfmiles.org.apache.velocity.exception.TemplateInitException;
+import com.github.pfmiles.org.apache.velocity.exception.VelocityException;
 import com.github.pfmiles.org.apache.velocity.runtime.RuntimeConstants;
 import com.github.pfmiles.org.apache.velocity.runtime.RuntimeServices;
 import com.github.pfmiles.org.apache.velocity.runtime.log.Log;
@@ -150,10 +148,6 @@ public class Parse extends InputBase
         String arg = value == null ? null : value.toString();
 
         /*
-         *  check to see if the argument will be changed by the event cartridge
-         */
-//        String arg = EventHandlerUtil.includeEvent( rsvc, context, sourcearg, context.getCurrentTemplateName(), getName());
-        /*
          *   a null return value from the event cartridge indicates we should not
          *   input a resource.
          */
@@ -192,7 +186,8 @@ public class Parse extends InputBase
 
         try
         {
-            t = rsvc.getTemplate( arg, getInputEncoding(context) );
+//            t = rsvc.getTemplate( arg, getInputEncoding(context) );
+            t = rsvc.getTempSupportRelPath(arg, getInputEncoding(context), this.getTemplateName());
         }
         catch ( ResourceNotFoundException rnfe )
         {

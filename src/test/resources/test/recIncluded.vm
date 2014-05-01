@@ -1,0 +1,2 @@
+$hello
+$ParseUtil.recParsing("recIncluded1.vm").addParam("hello", $hello)

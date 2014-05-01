@@ -23,9 +23,10 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.github.pfmiles.minvelocity.TemplateRenderUtil;
+import com.github.pfmiles.minvelocity.TemplateUtil;
 
 /**
  * 根据apiMeta，生成业务sdk代码的util类
@@ -56,22 +57,22 @@ public class ApiCodeGenUtilTest extends TestCase {
         List<JavaSourceFile> ret = new ArrayList<JavaSourceFile>();
         for (NsInfo ns : infos) {
             for (ApiInfo api : ns.getApiInfos()) {
-                Map<String, Object> ctxPojo = new HashMap<String, Object>();
+                Map<String, Object> ctxPojo = getCtxMap();
                 ctxPojo.put("site", site);
                 ctxPojo.put("api", api);
                 ctxPojo.put("ns", ns);
                 JavaSourceFile rstFile = new JavaSourceFile(StringUtils.capitalize(api.getMethodName()) + "Result.java", site.getBasePkgName()
-                        + ".result." + ns.getNsName(), TemplateRenderUtil.render("sdkTemp/code/apiResult.vm", ctxPojo));
+                        + ".result." + ns.getNsName(), TemplateUtil.render("sdkTemp/code/apiResult.vm", ctxPojo));
                 // JavaCodeFormattingUtil.tryFormat(rstFile);
                 ret.add(rstFile);
                 // 生成深度result类源码：
                 for (DeepAttrInfo deepInfo : extractDeepInfos(api.getResultInfo())) {
-                    Map<String, Object> deepCtx = new HashMap<String, Object>();
+                    Map<String, Object> deepCtx = getCtxMap();
                     deepCtx.put("site", site);
                     deepCtx.put("ns", ns);
                     deepCtx.put("deepInfo", deepInfo);
                     JavaSourceFile deepFile = new JavaSourceFile(StringUtils.capitalize(deepInfo.getAttClsName()) + ".java", site.getBasePkgName()
-                            + ".result." + ns.getNsName(), TemplateRenderUtil.render("sdkTemp/code/deepResultBean.vm", deepCtx));
+                            + ".result." + ns.getNsName(), TemplateUtil.render("sdkTemp/code/deepResultBean.vm", deepCtx));
                     // JavaCodeFormattingUtil.tryFormat(deepFile);
                     ret.add(deepFile);
                 }
@@ -96,12 +97,12 @@ public class ApiCodeGenUtilTest extends TestCase {
         List<JavaSourceFile> ret = new ArrayList<JavaSourceFile>();
         for (NsInfo ns : infos) {
             for (ApiInfo api : ns.getApiInfos()) {
-                Map<String, Object> ctxPojo = new HashMap<String, Object>();
+                Map<String, Object> ctxPojo = getCtxMap();
                 ctxPojo.put("site", site);
                 ctxPojo.put("api", api);
                 ctxPojo.put("ns", ns);
                 JavaSourceFile paramFile = new JavaSourceFile(StringUtils.capitalize(api.getMethodName()) + "Param.java", site.getBasePkgName()
-                        + ".param." + ns.getNsName(), TemplateRenderUtil.render("sdkTemp/code/apiParam.vm", ctxPojo));
+                        + ".param." + ns.getNsName(), TemplateUtil.render("sdkTemp/code/apiParam.vm", ctxPojo));
                 // JavaCodeFormattingUtil.tryFormat(paramFile);
                 ret.add(paramFile);
             }
@@ -111,10 +112,10 @@ public class ApiCodeGenUtilTest extends TestCase {
 
     // 生成api主类代码
     private static JavaSourceFile genApiFacade(List<NsInfo> infos, Site site) {
-        Map<String, Object> ctxPojo = new HashMap<String, Object>();
+        Map<String, Object> ctxPojo = getCtxMap();
         ctxPojo.put("infos", infos);
         ctxPojo.put("site", site);
-        JavaSourceFile ret = new JavaSourceFile(site.getMainClsName() + ".java", site.getBasePkgName(), TemplateRenderUtil.render(
+        JavaSourceFile ret = new JavaSourceFile(site.getMainClsName() + ".java", site.getBasePkgName(), TemplateUtil.render(
                 "sdkTemp/code/ApiFacade.vm", ctxPojo));
         // JavaCodeFormattingUtil.tryFormat(ret);
         return ret;
@@ -137,7 +138,7 @@ public class ApiCodeGenUtilTest extends TestCase {
         List<NsInfo> infos2 = new ArrayList<NsInfo>();
         infos2.add(fakeNsInfo());
         for (JavaSourceFile s : genResultPojos(infos2, Site.CBU)) {
-            System.out.println(s.getName() + ": ");
+            // System.out.println(s.getName() + ": ");
             // System.out.println(s.getCharContent(true));
             assertTrue(s.getCharContent(true) != null);
         }
@@ -188,6 +189,13 @@ public class ApiCodeGenUtilTest extends TestCase {
         resultInfo.put("detail", detailMeta);
         ret.setResultInfo(resultInfo);
         ret.setResultLocatingExpr("/test/test1[2]/test2");
+        return ret;
+    }
+
+    private static Map<String, Object> getCtxMap() {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        ret.put("StringUtils", StringUtils.class);
+        ret.put("ClassUtils", ClassUtils.class);
         return ret;
     }
 }

@@ -1,1 +1,1 @@
-My name is #parse("test/parsed.vm")!
+My name is #parse("/test/parsed.vm")!

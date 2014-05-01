@@ -173,11 +173,11 @@ public interface RuntimeConstants
     /** Maximum recursion depth allowed for the #define directive. */
     String DEFINE_DIRECTIVE_MAXDEPTH = "directive.define.max.depth";
 
-    /**
-     * class to use for local context with #evaluate()
-     * @since 1.6
-     */
-    String EVALUATE_CONTEXT_CLASS = "directive.evaluate.context.class";
+//    /**
+//     * class to use for local context with #evaluate()
+//     * @since 1.6
+//     */
+//    String EVALUATE_CONTEXT_CLASS = "directive.evaluate.context.class";
 
     /**
      * Used to suppress various scope control objects.
@@ -219,11 +219,11 @@ public interface RuntimeConstants
      */
     String RESOURCE_LOADER = "resource.loader";
 
-    /** The public handle for setting a path in the FileResourceLoader. */
-    String FILE_RESOURCE_LOADER_PATH = "file.resource.loader.path";
-
-    /** The public handle for turning the caching on in the FileResourceLoader. */
-    String FILE_RESOURCE_LOADER_CACHE = "file.resource.loader.cache";
+//    /** The public handle for setting a path in the FileResourceLoader. */
+//    String FILE_RESOURCE_LOADER_PATH = "file.resource.loader.path";
+//
+//    /** The public handle for turning the caching on in the FileResourceLoader. */
+//    String FILE_RESOURCE_LOADER_CACHE = "file.resource.loader.cache";
 
     /*
      * ----------------------------------------------------------------------
@@ -231,35 +231,35 @@ public interface RuntimeConstants
      * ----------------------------------------------------------------------
      */
 
-    /**
-     * The <code>eventhandler.referenceinsertion.class</code> property specifies a list of the
-     * {@link org.apache.velocity.app.event.ReferenceInsertionEventHandler} implementations to use.
-     */
-    String EVENTHANDLER_REFERENCEINSERTION = "eventhandler.referenceinsertion.class";
-
-    /**
-     * The <code>eventhandler.nullset.class</code> property specifies a list of the
-     * {@link org.apache.velocity.app.event.NullSetEventHandler} implementations to use.
-     */
-    String EVENTHANDLER_NULLSET = "eventhandler.nullset.class";
-
-    /**
-     * The <code>eventhandler.methodexception.class</code> property specifies a list of the
-     * {@link org.apache.velocity.app.event.MethodExceptionEventHandler} implementations to use.
-     */
-    String EVENTHANDLER_METHODEXCEPTION = "eventhandler.methodexception.class";
-
-    /**
-     * The <code>eventhandler.include.class</code> property specifies a list of the
-     * {@link org.apache.velocity.app.event.IncludeEventHandler} implementations to use.
-     */
-    String EVENTHANDLER_INCLUDE = "eventhandler.include.class";
-
-    /**
-     * The <code>eventhandler.invalidreferences.class</code> property specifies a list of the
-     * {@link org.apache.velocity.app.event.InvalidReferenceEventHandler} implementations to use.
-     */
-    String EVENTHANDLER_INVALIDREFERENCES = "eventhandler.invalidreferences.class";
+//    /**
+//     * The <code>eventhandler.referenceinsertion.class</code> property specifies a list of the
+//     * {@link org.apache.velocity.app.event.ReferenceInsertionEventHandler} implementations to use.
+//     */
+//    String EVENTHANDLER_REFERENCEINSERTION = "eventhandler.referenceinsertion.class";
+//
+//    /**
+//     * The <code>eventhandler.nullset.class</code> property specifies a list of the
+//     * {@link org.apache.velocity.app.event.NullSetEventHandler} implementations to use.
+//     */
+//    String EVENTHANDLER_NULLSET = "eventhandler.nullset.class";
+//
+//    /**
+//     * The <code>eventhandler.methodexception.class</code> property specifies a list of the
+//     * {@link org.apache.velocity.app.event.MethodExceptionEventHandler} implementations to use.
+//     */
+//    String EVENTHANDLER_METHODEXCEPTION = "eventhandler.methodexception.class";
+//
+//    /**
+//     * The <code>eventhandler.include.class</code> property specifies a list of the
+//     * {@link org.apache.velocity.app.event.IncludeEventHandler} implementations to use.
+//     */
+//    String EVENTHANDLER_INCLUDE = "eventhandler.include.class";
+//
+//    /**
+//     * The <code>eventhandler.invalidreferences.class</code> property specifies a list of the
+//     * {@link org.apache.velocity.app.event.InvalidReferenceEventHandler} implementations to use.
+//     */
+//    String EVENTHANDLER_INVALIDREFERENCES = "eventhandler.invalidreferences.class";
 
 
     /*
@@ -268,44 +268,44 @@ public interface RuntimeConstants
      * ----------------------------------------------------------------------
      */
 
-    /** Name of local Velocimacro library template. */
-    String VM_LIBRARY = "velocimacro.library";
+//    /** Name of local Velocimacro library template. */
+//    String VM_LIBRARY = "velocimacro.library";
+//
+//    /** Default Velocimacro library template. */
+//    String VM_LIBRARY_DEFAULT = "VM_global_library.vm";
+//
+//    /** switch for autoloading library-sourced VMs (for development). */
+//    String VM_LIBRARY_AUTORELOAD = "velocimacro.library.autoreload";
+//
+//    /** boolean (true/false) default true : allow inline (in-template) macro definitions. */
+//    String VM_PERM_ALLOW_INLINE = "velocimacro.permissions.allow.inline";
+//
+//    /** boolean (true/false) default false : allow inline (in-template) macro definitions to replace existing. */
+//    String VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL = "velocimacro.permissions.allow.inline.to.replace.global";
+//
+//    /** Switch for forcing inline macros to be local : default false. */
+//    String VM_PERM_INLINE_LOCAL = "velocimacro.permissions.allow.inline.local.scope";
+//
+//    /** Switch for VM blather : default true. */
+//    String VM_MESSAGES_ON = "velocimacro.messages.on";
+//
+//    /** switch for local context in VM : default false. */
+//    String VM_CONTEXT_LOCALSCOPE = "velocimacro.context.localscope";
+//
+//    /** if true, throw an exception for wrong number of arguments **/
+//    String VM_ARGUMENTS_STRICT = "velocimacro.arguments.strict";
 
-    /** Default Velocimacro library template. */
-    String VM_LIBRARY_DEFAULT = "VM_global_library.vm";
-
-    /** switch for autoloading library-sourced VMs (for development). */
-    String VM_LIBRARY_AUTORELOAD = "velocimacro.library.autoreload";
-
-    /** boolean (true/false) default true : allow inline (in-template) macro definitions. */
-    String VM_PERM_ALLOW_INLINE = "velocimacro.permissions.allow.inline";
-
-    /** boolean (true/false) default false : allow inline (in-template) macro definitions to replace existing. */
-    String VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL = "velocimacro.permissions.allow.inline.to.replace.global";
-
-    /** Switch for forcing inline macros to be local : default false. */
-    String VM_PERM_INLINE_LOCAL = "velocimacro.permissions.allow.inline.local.scope";
-
-    /** Switch for VM blather : default true. */
-    String VM_MESSAGES_ON = "velocimacro.messages.on";
-
-    /** switch for local context in VM : default false. */
-    String VM_CONTEXT_LOCALSCOPE = "velocimacro.context.localscope";
-
-    /** if true, throw an exception for wrong number of arguments **/
-    String VM_ARGUMENTS_STRICT = "velocimacro.arguments.strict";
-
-    /**
-     * Specify the maximum depth for macro calls
-     * @since 1.6
-     */
-    String VM_MAX_DEPTH = "velocimacro.max.depth";
-
-    /**
-     * Defines name of the reference that can be used to get the AST block passed to block macro calls.
-     * @since 1.7
-     */
-    String VM_BODY_REFERENCE = "velocimacro.body.reference";
+//    /**
+//     * Specify the maximum depth for macro calls
+//     * @since 1.6
+//     */
+//    String VM_MAX_DEPTH = "velocimacro.max.depth";
+//
+//    /**
+//     * Defines name of the reference that can be used to get the AST block passed to block macro calls.
+//     * @since 1.7
+//     */
+//    String VM_BODY_REFERENCE = "velocimacro.body.reference";
     
     /*
      * ----------------------------------------------------------------------
@@ -337,16 +337,16 @@ public interface RuntimeConstants
     /** Switch for ignoring nulls in math equations vs throwing exceptions. */
     String STRICT_MATH = "runtime.strict.math";
 
-    /**
-     * The <code>parser.pool.class</code> property specifies the name of the {@link org.apache.velocity.util.SimplePool}
-     * implementation to use.
-     */
-    String PARSER_POOL_CLASS = "parser.pool.class";
-
-    /**
-     * @see  #NUMBER_OF_PARSERS
-     */
-    String PARSER_POOL_SIZE = "parser.pool.size";
+//    /**
+//     * The <code>parser.pool.class</code> property specifies the name of the {@link org.apache.velocity.util.SimplePool}
+//     * implementation to use.
+//     */
+//    String PARSER_POOL_CLASS = "parser.pool.class";
+//
+//    /**
+//     * @see  #NUMBER_OF_PARSERS
+//     */
+//    String PARSER_POOL_SIZE = "parser.pool.size";
     
     /*
      * ----------------------------------------------------------------------
@@ -362,13 +362,14 @@ public interface RuntimeConstants
     /** Default Runtime properties. */
     String DEFAULT_RUNTIME_DIRECTIVES = "com/github/pfmiles/org/apache/velocity/runtime/defaults/directive.properties";
 
-    /**
-     * The default number of parser instances to create. Configurable via the parameter named by the {@link #PARSER_POOL_SIZE}
-     * constant.
-     */
-    int NUMBER_OF_PARSERS = 1;
+//    /**
+//     * The default number of parser instances to create. Configurable via the parameter named by the {@link #PARSER_POOL_SIZE}
+//     * constant.
+//     */
+//    int NUMBER_OF_PARSERS = 1;
 
-    
+    /** 默认被放入模板context的静态工具类映射，可配置多个值，值格式为： key:fullQualifiedClassName */
+    String DEFAULT_STATIC_UTIL_MAPPINGS = "default.static.util.mappings";
 
 
 

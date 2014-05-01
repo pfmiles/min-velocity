@@ -21,6 +21,7 @@ package com.github.pfmiles.org.apache.velocity.runtime.parser.node;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.github.pfmiles.minvelocity.ParseUtil;
 import com.github.pfmiles.org.apache.commons.lang.ArrayUtils;
 import com.github.pfmiles.org.apache.commons.lang.StringUtils;
 import com.github.pfmiles.org.apache.velocity.context.InternalContextAdapter;
@@ -141,7 +142,7 @@ public class ASTMethod extends SimpleNode
            * sadly, we do need recalc the values of the args, as this can
            * change from visit to visit
            */
-        final Class[] paramClasses =       
+        Class[] paramClasses =       
             paramCount > 0 ? new Class[paramCount] : ArrayUtils.EMPTY_CLASS_ARRAY;
 
         for (int j = 0; j < paramCount; j++)
@@ -152,7 +153,18 @@ public class ASTMethod extends SimpleNode
                 paramClasses[j] = params[j].getClass();
             }
         }
+        // 新增recParsing机制：
+        if(ParseUtil.class.equals(o) && "recParsing".equals(methodName) && paramCount == 1){
+            Object[] temp = params;
+            params = new Object[2];
+            params[0] = temp[0];
+            params[1] = this.getTemplateName();
             
+            Class[] clsTemp = paramClasses;
+            paramClasses = new Class[2];
+            paramClasses[0] = clsTemp[0];
+            paramClasses[1] = String.class;
+        }
         VelMethod method = ClassUtils.getMethod(methodName, params, paramClasses, 
             o, context, this, strictRef);
         if (method == null) return null;

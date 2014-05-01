@@ -1,42 +1,35 @@
-/*******************************************************************************
- * Copyright 2014 pf-miles
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 package com.github.pfmiles.minvelocity;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.github.pfmiles.minvelocity.biztest.BizUtil;
+import com.github.pfmiles.org.apache.commons.collections.ExtendedProperties;
 import com.github.pfmiles.org.apache.velocity.VelocityContext;
 import com.github.pfmiles.org.apache.velocity.app.VelocityEngine;
 import com.github.pfmiles.org.apache.velocity.context.Context;
+import com.github.pfmiles.org.apache.velocity.runtime.RuntimeConstants;
 
-public class TemplateRenderUtil {
+/**
+ * @author pf-miles
+ * 
+ */
+public class TemplateUtil {
 
-    private static final Properties props = new Properties();
+    private static ExtendedProperties props = new ExtendedProperties();
     private static final VelocityEngine tempEngine = new VelocityEngine();
     static {
         try {
+            InputStream propStream = ImplHelper.getCurrentClsLoader().getResourceAsStream("min-velocity.properties");
+            if (propStream != null) {
+                tempEngine.getLog().debug("'min-velocity.properties' at classpath root found, loading...");
+                props.load(propStream, "UTF-8");
+            }
             tempEngine.init(props);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -54,6 +47,8 @@ public class TemplateRenderUtil {
      */
     public static <T> String render(String tempPath, T ctxPojo) {
         Context ctx = new VelocityContext();
+        ctx.put("ParseUtil", ParseUtil.class);
+        putAllDefaultStaticUtils(ctx);
         putAllPojoVals(ctxPojo, ctx);
         StringWriter writer = new StringWriter();
         try {
@@ -64,10 +59,22 @@ public class TemplateRenderUtil {
         return writer.toString();
     }
 
+    @SuppressWarnings("unchecked")
+    private static void putAllDefaultStaticUtils(Context ctx) {
+        List<String> ms = (List<String>) tempEngine.getProperty(RuntimeConstants.DEFAULT_STATIC_UTIL_MAPPINGS);
+        if (ms != null)
+            for (String m : ms) {
+                String[] kv = m.split(":");
+                try {
+                    ctx.put(kv[0].trim(), ImplHelper.getCurrentClsLoader().loadClass(kv[1].trim()));
+                } catch (ClassNotFoundException e) {
+                    tempEngine.getLog().error("Could not load static util class: " + kv[0], e);
+                }
+            }
+    }
+
     private static void putAllPojoVals(Object ctxPojo, Context ctx) {
-        ctx.put("StringUtils", StringUtils.class);
-        ctx.put("ClassUtils", ClassUtils.class);
-        ctx.put("BizUtil", BizUtil.class);
+        ctx.put("ParseUtil", ParseUtil.class);
         if (ctxPojo == null)
             return;
         if (ctxPojo instanceof Map) {
@@ -90,5 +97,4 @@ public class TemplateRenderUtil {
             }
         }
     }
-
 }
