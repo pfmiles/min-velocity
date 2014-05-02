@@ -13,7 +13,7 @@
 
 ## 改动：
 * requires jdk1.5+
-* 默认情况下，日志输出到标准输出/标准错误流而非文件
+* 默认情况下，不打印任何日志
 * 默认采用classpath模板加载器而非文件系统模板加载器
 * default I/O encoding changed to UTF-8(from iso-8859-1)
 * 对于#set指令，默认允许设置null值
@@ -32,7 +32,7 @@
 * No '#define'
 * No '#break'
 * requires jdk1.5+
-* By default logs to stdin/stderr rather than velocity.log
+* By default no logs rather than log to velocity.log
 * defaults to use classapth resource loader
 * I/O encoding defaults to UTF-8
 * #set directive defaults to allow null value
