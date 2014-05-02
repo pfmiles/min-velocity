@@ -22,7 +22,7 @@
 * #parse和#include标签支持相对路径
 * 新增$ParseUtil.recParsing("xxx.vm").addParam("key", val)模板调用形式；相当于带调用栈的#parse标签，能用在当你需要每层递归的context都相互隔离的递归#parse的时候；也能支持相对路径
 * 可放置min-velocity.properties文件(可选)在classpath根路径下，用于覆盖velocity的各种默认属性
-* min-velocity.properties可使用default.static.util.mappings属性配置默认的静态工具类，这些工具类将被默认放入模板context中，刻配置多个，如：default.static.util.mappings = ClassUtils:org.apache.commons.lang.ClassUtils
+* min-velocity.properties可使用default.static.util.mappings属性配置默认的静态工具类，这些工具类将被默认放入模板context中，可配置多个，如：default.static.util.mappings = ClassUtils:org.apache.commons.lang.ClassUtils
 
 ## For English speakers, see below:
 * No event mechanism
