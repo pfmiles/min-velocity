@@ -23,6 +23,8 @@
 * 新增$ParseUtil.recParsing("xxx.vm").addParam("key", val)模板调用形式；相当于带调用栈的#parse标签，能用在当你需要每层递归的context都相互隔离的递归#parse的时候；也能支持相对路径
 * 可放置min-velocity.properties文件(可选)在classpath根路径下，用于覆盖velocity的各种默认属性
 * min-velocity.properties可使用default.static.util.mappings属性配置默认的静态工具类，这些工具类将被默认放入模板context中，可配置多个，如：default.static.util.mappings = ClassUtils:org.apache.commons.lang.ClassUtils
+* TODO 设置streamReferenceRendering开关，默认关闭，开启后，遇到reference是stream或reader的时候, 将读取stream或reader中的内容做渲染而非简单地toString渲染; 其中读取stream或writer的buffer可配置大小
+* 支持String模板渲染，即直接将模板内容以String形式传入api进行渲染而不是只能选择传入一个模板路径
 
 ## For English speakers, see below:
 * No event mechanism
@@ -44,3 +46,6 @@ which could easily do recursive parsing with isolated context in each round of r
 * could place an optional 'min-velocity.properties' file in classpath root to configure velocity runtime.
 * min-velocity could contain zero or more 'default.static.util.mappings' property configs to expose static utility classes in template contexts, for example: default.static.util.mappings = ClassUtils:org.apache.commons.lang.ClassUtils, 
 with this config you can reference to org.apache.commons.lang.ClassUtils class with key 'ClassUtils' anywhere.
+* stream/reader reference rendering supported. If you set 'stream.reference.rendering'(default false) to 'true', min-velocity will dump the contents of a stream/reader reference rather than just invoking 'toString' on them while rendering.
+And the stream/reader reading buffer could be specified by configuration 'stream.reference.buffer.size', measured in bytes(default 1048576).
+* String literal templates rendering supported. Just specify template contents in a in-memory-String value to render, other than always specify a template path.

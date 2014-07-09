@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.List;
 
 import com.github.pfmiles.org.apache.velocity.context.Context;
 import com.github.pfmiles.org.apache.velocity.context.InternalContextAdapterImpl;
@@ -72,7 +71,7 @@ public class Template extends Resource
     private String scopeName = "template";
     private boolean provideScope = false;
 
-    private VelocityException errorCondition = null;
+    protected VelocityException errorCondition = null;
 
     /** Default constructor */
     public Template()

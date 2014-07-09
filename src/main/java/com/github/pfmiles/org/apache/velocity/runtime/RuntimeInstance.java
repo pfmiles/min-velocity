@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.github.pfmiles.minvelocity.ImplHelper;
+import com.github.pfmiles.minvelocity.StringTemplate;
 import com.github.pfmiles.org.apache.commons.collections.ExtendedProperties;
 import com.github.pfmiles.org.apache.velocity.Template;
 import com.github.pfmiles.org.apache.velocity.context.Context;
@@ -60,72 +61,68 @@ import com.github.pfmiles.org.apache.velocity.util.introspection.Uberspect;
 import com.github.pfmiles.org.apache.velocity.util.introspection.UberspectLoggable;
 
 /**
- * This is the Runtime system for Velocity. It is the
- * single access point for all functionality in Velocity.
- * It adheres to the mediator pattern and is the only
- * structure that developers need to be familiar with
- * in order to get Velocity to perform.
- *
- * The Runtime will also cooperate with external
- * systems like Turbine. Runtime properties can
- * set and then the Runtime is initialized.
- *
- * Turbine, for example, knows where the templates
- * are to be loaded from, and where the Velocity
- * log file should be placed.
- *
- * So in the case of Velocity cooperating with Turbine
- * the code might look something like the following:
- *
+ * This is the Runtime system for Velocity. It is the single access point for
+ * all functionality in Velocity. It adheres to the mediator pattern and is the
+ * only structure that developers need to be familiar with in order to get
+ * Velocity to perform.
+ * 
+ * The Runtime will also cooperate with external systems like Turbine. Runtime
+ * properties can set and then the Runtime is initialized.
+ * 
+ * Turbine, for example, knows where the templates are to be loaded from, and
+ * where the Velocity log file should be placed.
+ * 
+ * So in the case of Velocity cooperating with Turbine the code might look
+ * something like the following:
+ * 
  * <blockquote><code><pre>
  * ri.setProperty(Runtime.FILE_RESOURCE_LOADER_PATH, templatePath);
  * ri.setProperty(Runtime.RUNTIME_LOG, pathToVelocityLog);
  * ri.init();
  * </pre></code></blockquote>
- *
+ * 
  * <pre>
  * -----------------------------------------------------------------------
  * N O T E S  O N  R U N T I M E  I N I T I A L I Z A T I O N
  * -----------------------------------------------------------------------
  * init()
- *
+ * 
  * If init() is called by itself the RuntimeInstance will initialize
  * with a set of default values.
  * -----------------------------------------------------------------------
  * init(String/Properties)
- *
+ * 
  * In this case the default velocity properties are layed down
  * first to provide a solid base, then any properties provided
  * in the given properties object will override the corresponding
  * default property.
  * -----------------------------------------------------------------------
  * </pre>
- *
+ * 
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:jlb@houseofdistraction.com">Jeff Bowden</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magusson Jr.</a>
  * @author pf-miles
  * @version $Id: RuntimeInstance.java 898050 2010-01-11 20:15:31Z nbubna $
  */
-public class RuntimeInstance implements RuntimeConstants, RuntimeServices
-{
+public class RuntimeInstance implements RuntimeConstants, RuntimeServices {
     /**
-     *  VelocimacroFactory object to manage VMs
+     * VelocimacroFactory object to manage VMs
      */
-//    private  VelocimacroFactory vmFactory = null;
+    // private VelocimacroFactory vmFactory = null;
 
     /**
-     * The Runtime logger.  We start with an instance of
-     * a 'primordial logger', which just collects log messages
-     * then, when the log system is initialized, all the
-     * messages get dumpted out of the primordial one into the real one.
+     * The Runtime logger. We start with an instance of a 'primordial logger',
+     * which just collects log messages then, when the log system is
+     * initialized, all the messages get dumpted out of the primordial one into
+     * the real one.
      */
     private Log log = new Log();
 
-//    /**
-//     * The Runtime parser pool
-//     */
-//    private  ParserPool parserPool;
+    // /**
+    // * The Runtime parser pool
+    // */
+    // private ParserPool parserPool;
 
     /**
      * Indicate whether the Runtime is in the midst of initialization.
@@ -138,66 +135,61 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     private volatile boolean initialized = false;
 
     /**
-     * These are the properties that are laid down over top
-     * of the default properties when requested.
+     * These are the properties that are laid down over top of the default
+     * properties when requested.
      */
-    private  ExtendedProperties overridingProperties = null;
+    private ExtendedProperties overridingProperties = null;
 
     /**
-     * This is a hashtable of initialized directives.
-     * The directives that populate this hashtable are
-     * taken from the RUNTIME_DEFAULT_DIRECTIVES
-     * property file. 
+     * This is a hashtable of initialized directives. The directives that
+     * populate this hashtable are taken from the RUNTIME_DEFAULT_DIRECTIVES
+     * property file.
      */
     private Map runtimeDirectives = new Hashtable();
     /**
-     * Copy of the actual runtimeDirectives that is shared between
-     * parsers. Whenever directives are updated, the synchronized 
-     * runtimeDirectives is first updated and then an unsynchronized
-     * copy of it is passed to parsers.
+     * Copy of the actual runtimeDirectives that is shared between parsers.
+     * Whenever directives are updated, the synchronized runtimeDirectives is
+     * first updated and then an unsynchronized copy of it is passed to parsers.
      */
     private Map runtimeDirectivesShared;
 
     /**
-     * Object that houses the configuration options for
-     * the velocity runtime. The ExtendedProperties object allows
-     * the convenient retrieval of a subset of properties.
-     * For example all the properties for a resource loader
-     * can be retrieved from the main ExtendedProperties object
-     * using something like the following:
-     *
-     * ExtendedProperties loaderConfiguration =
-     *         configuration.subset(loaderID);
-     *
-     * And a configuration is a lot more convenient to deal
-     * with then conventional properties objects, or Maps.
+     * Object that houses the configuration options for the velocity runtime.
+     * The ExtendedProperties object allows the convenient retrieval of a subset
+     * of properties. For example all the properties for a resource loader can
+     * be retrieved from the main ExtendedProperties object using something like
+     * the following:
+     * 
+     * ExtendedProperties loaderConfiguration = configuration.subset(loaderID);
+     * 
+     * And a configuration is a lot more convenient to deal with then
+     * conventional properties objects, or Maps.
      */
     private ExtendedProperties configuration = new ExtendedProperties();
 
     private ResourceManager resourceManager = null;
 
-//    /**
-//     * This stores the engine-wide set of event handlers.  Event handlers for
-//     * each specific merge are stored in the context.
-//     */
-//    private EventCartridge eventCartridge = null;
+    // /**
+    // * This stores the engine-wide set of event handlers. Event handlers for
+    // * each specific merge are stored in the context.
+    // */
+    // private EventCartridge eventCartridge = null;
 
     /*
-     *  Each runtime instance has it's own introspector
-     *  to ensure that each instance is completely separate.
+     * Each runtime instance has it's own introspector to ensure that each
+     * instance is completely separate.
      */
     private Introspector introspector = null;
 
-//    /*
-//     * Settings for provision of root scope for evaluate(...) calls.
-//     */
-//    private String evaluateScopeName = "evaluate";
-//    private boolean provideEvaluateScope = false;
+    // /*
+    // * Settings for provision of root scope for evaluate(...) calls.
+    // */
+    // private String evaluateScopeName = "evaluate";
+    // private boolean provideEvaluateScope = false;
 
     /*
-     *  Opaque reference to something specificed by the
-     *  application for use in application supplied/specified
-     *  pluggable components
+     * Opaque reference to something specificed by the application for use in
+     * application supplied/specified pluggable components
      */
     private Map applicationAttributes = null;
     private Uberspect uberSpect;
@@ -206,15 +198,14 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     /**
      * Creates a new RuntimeInstance object.
      */
-    public RuntimeInstance()
-    {
+    public RuntimeInstance() {
         /*
-         *  create a VM factory, introspector, and application attributes
+         * create a VM factory, introspector, and application attributes
          */
-//        vmFactory = new VelocimacroFactory( this );
+        // vmFactory = new VelocimacroFactory( this );
 
         /*
-         *  make a new introspector and initialize it
+         * make a new introspector and initialize it
          */
         introspector = new Introspector(getLog());
 
@@ -225,24 +216,21 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     }
 
     /**
-     * This is the primary initialization method in the Velocity
-     * Runtime. The systems that are setup/initialized here are
-     * as follows:
-     *
+     * This is the primary initialization method in the Velocity Runtime. The
+     * systems that are setup/initialized here are as follows:
+     * 
      * <ul>
-     *   <li>Logging System</li>
-     *   <li>ResourceManager</li>
-     *   <li>EventHandler</li>
-     *   <li>Parser Pool</li>
-     *   <li>Global Cache</li>
-     *   <li>Static Content Include System</li>
-     *   <li>Velocimacro System</li>
+     * <li>Logging System</li>
+     * <li>ResourceManager</li>
+     * <li>EventHandler</li>
+     * <li>Parser Pool</li>
+     * <li>Global Cache</li>
+     * <li>Static Content Include System</li>
+     * <li>Velocimacro System</li>
      * </ul>
      */
-    public synchronized void init()
-    {
-        if (!initialized && !initializing)
-        {
+    public synchronized void init() {
+        if (!initialized && !initializing) {
             log.debug("Initializing Velocity, Calling init()...");
             initializing = true;
 
@@ -254,16 +242,16 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
             initializeLog();
             initializeResourceManager();
             initializeDirectives();
-//            initializeEventHandlers();
-//            initializeParserPool();
+            // initializeEventHandlers();
+            // initializeParserPool();
 
             initializeIntrospection();
-//            initializeEvaluateScopeSettings();
+            // initializeEvaluateScopeSettings();
             /*
-             *  initialize the VM Factory.  It will use the properties
-             * accessable from Runtime, so keep this here at the end.
+             * initialize the VM Factory. It will use the properties accessable
+             * from Runtime, so keep this here at the end.
              */
-//            vmFactory.initVelocimacro();
+            // vmFactory.initVelocimacro();
 
             log.trace("RuntimeInstance successfully initialized.");
 
@@ -274,27 +262,22 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
 
     /**
      * Returns true if the RuntimeInstance has been successfully initialized.
+     * 
      * @return True if the RuntimeInstance has been successfully initialized.
      * @since 1.5
      */
-    public boolean isInitialized()
-    {
+    public boolean isInitialized() {
         return initialized;
     }
 
     /**
      * Init or die! (with some log help, of course)
      */
-    private void requireInitialization()
-    {
-        if (!initialized)
-        {
-            try
-            {
+    private void requireInitialization() {
+        if (!initialized) {
+            try {
                 init();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 getLog().error("Could not auto-initialize Velocity", e);
                 throw new RuntimeException("Velocity could not be initialized!", e);
             }
@@ -302,136 +285,98 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     }
 
     /**
-     *  Gets the classname for the Uberspect introspection package and
-     *  instantiates an instance.
+     * Gets the classname for the Uberspect introspection package and
+     * instantiates an instance.
      */
-    private void initializeIntrospection()
-    {
+    private void initializeIntrospection() {
         String[] uberspectors = configuration.getStringArray(RuntimeConstants.UBERSPECT_CLASSNAME);
-        for (int i=0; i <uberspectors.length;i++)
-        {
+        for (int i = 0; i < uberspectors.length; i++) {
             String rm = uberspectors[i];
             Object o = null;
 
-            try
-            {
-               o = ClassUtils.getNewInstance( rm );
-            }
-            catch (ClassNotFoundException cnfe)
-            {
-                String err = "The specified class for Uberspect (" + rm
-                    + ") does not exist or is not accessible to the current classloader.";
+            try {
+                o = ClassUtils.getNewInstance(rm);
+            } catch (ClassNotFoundException cnfe) {
+                String err = "The specified class for Uberspect (" + rm + ") does not exist or is not accessible to the current classloader.";
                 log.error(err);
                 throw new VelocityException(err, cnfe);
-            }
-            catch (InstantiationException ie)
-            {
-              throw new VelocityException("Could not instantiate class '" + rm + "'", ie);
-            }
-            catch (IllegalAccessException ae)
-            {
-              throw new VelocityException("Cannot access class '" + rm + "'", ae);
+            } catch (InstantiationException ie) {
+                throw new VelocityException("Could not instantiate class '" + rm + "'", ie);
+            } catch (IllegalAccessException ae) {
+                throw new VelocityException("Cannot access class '" + rm + "'", ae);
             }
 
-            if (!(o instanceof Uberspect))
-            {
-                String err = "The specified class for Uberspect ("
-                    + rm + ") does not implement " + Uberspect.class.getName()
-                    + "; Velocity is not initialized correctly.";
+            if (!(o instanceof Uberspect)) {
+                String err = "The specified class for Uberspect (" + rm + ") does not implement " + Uberspect.class.getName()
+                        + "; Velocity is not initialized correctly.";
 
                 log.error(err);
                 throw new VelocityException(err);
             }
 
-            Uberspect u = (Uberspect)o;
+            Uberspect u = (Uberspect) o;
 
-            if (u instanceof UberspectLoggable)
-            {
-                ((UberspectLoggable)u).setLog(getLog());
+            if (u instanceof UberspectLoggable) {
+                ((UberspectLoggable) u).setLog(getLog());
             }
 
-            if (u instanceof RuntimeServicesAware)
-            {
-                ((RuntimeServicesAware)u).setRuntimeServices(this);
+            if (u instanceof RuntimeServicesAware) {
+                ((RuntimeServicesAware) u).setRuntimeServices(this);
             }
 
-            if (uberSpect == null)
-            {
+            if (uberSpect == null) {
                 uberSpect = u;
-            }
-            else
-            {
-                if (u instanceof ChainableUberspector)
-                {
-                    ((ChainableUberspector)u).wrap(uberSpect);
+            } else {
+                if (u instanceof ChainableUberspector) {
+                    ((ChainableUberspector) u).wrap(uberSpect);
                     uberSpect = u;
-                }
-                else
-                {
-                    uberSpect = new LinkingUberspector(uberSpect,u);
+                } else {
+                    uberSpect = new LinkingUberspector(uberSpect, u);
                 }
             }
         }
 
-        if(uberSpect != null)
-        {
+        if (uberSpect != null) {
             uberSpect.init();
-        }
-        else
-        {
-           /*
-            *  someone screwed up.  Lets not fool around...
-            */
+        } else {
+            /*
+             * someone screwed up. Lets not fool around...
+             */
 
-           String err = "It appears that no class was specified as the"
-           + " Uberspect.  Please ensure that all configuration"
-           + " information is correct.";
+            String err = "It appears that no class was specified as the" + " Uberspect.  Please ensure that all configuration"
+                    + " information is correct.";
 
-           log.error(err);
-           throw new VelocityException(err);
+            log.error(err);
+            throw new VelocityException(err);
         }
     }
 
     /**
-     * Initializes the Velocity Runtime with properties file.
-     * The properties file may be in the file system proper,
-     * or the properties file may be in the classpath.
+     * Initializes the Velocity Runtime with properties file. The properties
+     * file may be in the file system proper, or the properties file may be in
+     * the classpath.
      */
-    private void setDefaultProperties()
-    {
+    private void setDefaultProperties() {
         InputStream inputStream = null;
-        try
-        {
-            inputStream = getClass()
-                .getResourceAsStream('/' + DEFAULT_RUNTIME_PROPERTIES);
+        try {
+            inputStream = getClass().getResourceAsStream('/' + DEFAULT_RUNTIME_PROPERTIES);
 
-            configuration.load( inputStream );
+            configuration.load(inputStream);
 
-            if (log.isDebugEnabled())
-            {
-                log.debug("Default Properties File: " +
-                    new File(DEFAULT_RUNTIME_PROPERTIES).getPath());
+            if (log.isDebugEnabled()) {
+                log.debug("Default Properties File: " + new File(DEFAULT_RUNTIME_PROPERTIES).getPath());
             }
 
-
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             String msg = "Cannot get Velocity Runtime default properties!";
             log.error(msg, ioe);
             throw new RuntimeException(msg, ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (inputStream != null)
-                {
+        } finally {
+            try {
+                if (inputStream != null) {
                     inputStream.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 String msg = "Cannot close Velocity Runtime default properties!";
                 log.error(msg, ioe);
                 throw new RuntimeException(msg, ioe);
@@ -440,110 +385,89 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     }
 
     /**
-     * Allows an external system to set a property in
-     * the Velocity Runtime.
-     *
-     * @param key property key
-     * @param  value property value
+     * Allows an external system to set a property in the Velocity Runtime.
+     * 
+     * @param key
+     *            property key
+     * @param value
+     *            property value
      */
-    public void setProperty(String key, Object value)
-    {
-        if (overridingProperties == null)
-        {
+    public void setProperty(String key, Object value) {
+        if (overridingProperties == null) {
             overridingProperties = new ExtendedProperties();
         }
 
         overridingProperties.setProperty(key, value);
     }
-    
 
     /**
-     * Add all properties contained in the file fileName to the RuntimeInstance properties
+     * Add all properties contained in the file fileName to the RuntimeInstance
+     * properties
      */
-    public void setProperties(String fileName)
-    {
+    public void setProperties(String fileName) {
         ExtendedProperties props = null;
-        try
-        {
-              props = new ExtendedProperties(fileName);
-        } 
-        catch (IOException e)
-        {
-              throw new VelocityException("Error reading properties from '" 
-                + fileName + "'", e);
+        try {
+            props = new ExtendedProperties(fileName);
+        } catch (IOException e) {
+            throw new VelocityException("Error reading properties from '" + fileName + "'", e);
         }
-        
+
         Enumeration en = props.keys();
-        while (en.hasMoreElements())
-        {
+        while (en.hasMoreElements()) {
             String key = en.nextElement().toString();
             setProperty(key, props.get(key));
         }
     }
-    
 
     /**
      * Add all the properties in props to the RuntimeInstance properties
      */
-    public void setProperties(Properties props)
-    {
+    public void setProperties(Properties props) {
         Enumeration en = props.keys();
-        while (en.hasMoreElements())
-        {
+        while (en.hasMoreElements()) {
             String key = en.nextElement().toString();
             setProperty(key, props.get(key));
         }
     }
-        
+
     /**
-     * Allow an external system to set an ExtendedProperties
-     * object to use. This is useful where the external
-     * system also uses the ExtendedProperties class and
-     * the velocity configuration is a subset of
-     * parent application's configuration. This is
-     * the case with Turbine.
-     *
-     * @param  configuration
+     * Allow an external system to set an ExtendedProperties object to use. This
+     * is useful where the external system also uses the ExtendedProperties
+     * class and the velocity configuration is a subset of parent application's
+     * configuration. This is the case with Turbine.
+     * 
+     * @param configuration
      */
-    public void setConfiguration( ExtendedProperties configuration)
-    {
-        if (overridingProperties == null)
-        {
+    public void setConfiguration(ExtendedProperties configuration) {
+        if (overridingProperties == null) {
             overridingProperties = configuration;
-        }
-        else
-        {
+        } else {
             // Avoid possible ConcurrentModificationException
-            if (overridingProperties != configuration)
-            {
+            if (overridingProperties != configuration) {
                 overridingProperties.combine(configuration);
             }
         }
     }
 
     /**
-     * Add a property to the configuration. If it already
-     * exists then the value stated here will be added
-     * to the configuration entry. For example, if
-     *
+     * Add a property to the configuration. If it already exists then the value
+     * stated here will be added to the configuration entry. For example, if
+     * 
      * resource.loader = file
-     *
+     * 
      * is already present in the configuration and you
-     *
+     * 
      * addProperty("resource.loader", "classpath")
-     *
-     * Then you will end up with a Vector like the
-     * following:
-     *
+     * 
+     * Then you will end up with a Vector like the following:
+     * 
      * ["file", "classpath"]
-     *
-     * @param  key
-     * @param  value
+     * 
+     * @param key
+     * @param value
      */
-    public void addProperty(String key, Object value)
-    {
-        if (overridingProperties == null)
-        {
+    public void addProperty(String key, Object value) {
+        if (overridingProperties == null) {
             overridingProperties = new ExtendedProperties();
         }
 
@@ -551,167 +475,132 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     }
 
     /**
-     * Clear the values pertaining to a particular
-     * property.
-     *
-     * @param key of property to clear
+     * Clear the values pertaining to a particular property.
+     * 
+     * @param key
+     *            of property to clear
      */
-    public void clearProperty(String key)
-    {
-        if (overridingProperties != null)
-        {
+    public void clearProperty(String key) {
+        if (overridingProperties != null) {
             overridingProperties.clearProperty(key);
         }
     }
 
     /**
-     *  Allows an external caller to get a property.  The calling
-     *  routine is required to know the type, as this routine
-     *  will return an Object, as that is what properties can be.
-     *
-     *  @param key property to return
-     *  @return Value of the property or null if it does not exist.
+     * Allows an external caller to get a property. The calling routine is
+     * required to know the type, as this routine will return an Object, as that
+     * is what properties can be.
+     * 
+     * @param key
+     *            property to return
+     * @return Value of the property or null if it does not exist.
      */
-    public Object getProperty(String key)
-    {
+    public Object getProperty(String key) {
         Object o = null;
-        
+
         /**
          * Before initialization, check the user-entered properties first.
          */
-        if (!initialized && overridingProperties != null) 
-        {
+        if (!initialized && overridingProperties != null) {
             o = overridingProperties.get(key);
         }
-        
+
         /**
          * After initialization, configuration will hold all properties.
          */
-        if (o == null) 
-        {
+        if (o == null) {
             o = configuration.getProperty(key);
         }
-        if (o instanceof String)
-        {
+        if (o instanceof String) {
             return StringUtils.nullTrim((String) o);
-        }
-        else
-        {
+        } else {
             return o;
         }
     }
 
     /**
-     * Initialize Velocity properties, if the default
-     * properties have not been laid down first then
-     * do so. Then proceed to process any overriding
-     * properties. Laying down the default properties
-     * gives a much greater chance of having a
-     * working system.
+     * Initialize Velocity properties, if the default properties have not been
+     * laid down first then do so. Then proceed to process any overriding
+     * properties. Laying down the default properties gives a much greater
+     * chance of having a working system.
      */
-    private void initializeProperties()
-    {
+    private void initializeProperties() {
         /*
-         * Always lay down the default properties first as
-         * to provide a solid base.
+         * Always lay down the default properties first as to provide a solid
+         * base.
          */
-        if (configuration.isInitialized() == false)
-        {
+        if (configuration.isInitialized() == false) {
             setDefaultProperties();
         }
 
-        if( overridingProperties != null)
-        {
+        if (overridingProperties != null) {
             configuration.combine(overridingProperties);
         }
     }
 
     /**
-     * Initialize the Velocity Runtime with a Properties
-     * object.
-     *
-     * @param p Velocity properties for initialization
+     * Initialize the Velocity Runtime with a Properties object.
+     * 
+     * @param p
+     *            Velocity properties for initialization
      */
-    public void init(Properties p)
-    {
+    public void init(Properties p) {
         setProperties(ExtendedProperties.convertProperties(p));
         init();
     }
 
-    private void setProperties(ExtendedProperties p)
-    {
-        if (overridingProperties == null)
-        {
+    private void setProperties(ExtendedProperties p) {
+        if (overridingProperties == null) {
             overridingProperties = p;
-        }
-        else
-        {
+        } else {
             overridingProperties.combine(p);
         }
     }
 
     /**
-     * Initialize the Velocity Runtime with the name of
-     * ExtendedProperties object.
-     *
+     * Initialize the Velocity Runtime with the name of ExtendedProperties
+     * object.
+     * 
      * @param configurationFile
      */
-    public void init(String configurationFile)
-    {
-        try
-        {
+    public void init(String configurationFile) {
+        try {
             setProperties(new ExtendedProperties(configurationFile));
-        } 
-        catch (IOException e)
-        {
-            throw new VelocityException("Error reading properties from '" 
-                + configurationFile + "'", e);
+        } catch (IOException e) {
+            throw new VelocityException("Error reading properties from '" + configurationFile + "'", e);
         }
         init();
     }
 
-    private void initializeResourceManager()
-    {
+    private void initializeResourceManager() {
         /*
          * Which resource manager?
-         */      
+         */
         String rm = getString(RuntimeConstants.RESOURCE_MANAGER_CLASS);
 
-        if (rm != null && rm.length() > 0)
-        {
+        if (rm != null && rm.length() > 0) {
             /*
-             *  if something was specified, then make one.
-             *  if that isn't a ResourceManager, consider
-             *  this a huge error and throw
+             * if something was specified, then make one. if that isn't a
+             * ResourceManager, consider this a huge error and throw
              */
 
             Object o = null;
 
-            try
-            {
-               o = ClassUtils.getNewInstance( rm );
-            }
-            catch (ClassNotFoundException cnfe )
-            {
-                String err = "The specified class for ResourceManager (" + rm
-                    + ") does not exist or is not accessible to the current classloader.";
+            try {
+                o = ClassUtils.getNewInstance(rm);
+            } catch (ClassNotFoundException cnfe) {
+                String err = "The specified class for ResourceManager (" + rm + ") does not exist or is not accessible to the current classloader.";
                 log.error(err);
                 throw new VelocityException(err, cnfe);
-            }
-            catch (InstantiationException ie)
-            {
-              throw new VelocityException("Could not instantiate class '" + rm + "'", ie);
-            }
-            catch (IllegalAccessException ae)
-            {
-              throw new VelocityException("Cannot access class '" + rm + "'", ae);
+            } catch (InstantiationException ie) {
+                throw new VelocityException("Could not instantiate class '" + rm + "'", ie);
+            } catch (IllegalAccessException ae) {
+                throw new VelocityException("Cannot access class '" + rm + "'", ae);
             }
 
-            if (!(o instanceof ResourceManager))
-            {
-                String err = "The specified class for ResourceManager (" + rm
-                    + ") does not implement " + ResourceManager.class.getName()
-                    + "; Velocity is not initialized correctly.";
+            if (!(o instanceof ResourceManager)) {
+                String err = "The specified class for ResourceManager (" + rm + ") does not implement " + ResourceManager.class.getName()
+                        + "; Velocity is not initialized correctly.";
 
                 log.error(err);
                 throw new VelocityException(err);
@@ -720,239 +609,228 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
             resourceManager = (ResourceManager) o;
 
             resourceManager.initialize(this);
-         }
-         else
-         {
+        } else {
             /*
-             *  someone screwed up.  Lets not fool around...
+             * someone screwed up. Lets not fool around...
              */
 
-            String err = "It appears that no class was specified as the"
-            + " ResourceManager.  Please ensure that all configuration"
-            + " information is correct.";
+            String err = "It appears that no class was specified as the" + " ResourceManager.  Please ensure that all configuration"
+                    + " information is correct.";
 
             log.error(err);
-            throw new VelocityException( err );
+            throw new VelocityException(err);
         }
     }
 
-//    private void initializeEventHandlers()
-//    {
-//
-//        eventCartridge = new EventCartridge();
-//
-//        /**
-//         * For each type of event handler, get the class name, instantiate it, and store it.
-//         */
-//
-//        String[] referenceinsertion = configuration.getStringArray(RuntimeConstants.EVENTHANDLER_REFERENCEINSERTION);
-//        if ( referenceinsertion != null )
-//        {
-//            for ( int i=0; i < referenceinsertion.length; i++ )
-//            {
-//                EventHandler ev = initializeSpecificEventHandler(referenceinsertion[i],RuntimeConstants.EVENTHANDLER_REFERENCEINSERTION,ReferenceInsertionEventHandler.class);
-//                if (ev != null)
-//                    eventCartridge.addReferenceInsertionEventHandler((ReferenceInsertionEventHandler) ev);
-//            }
-//        }
-//
-//        String[] nullset = configuration.getStringArray(RuntimeConstants.EVENTHANDLER_NULLSET);
-//        if ( nullset != null )
-//        {
-//            for ( int i=0; i < nullset.length; i++ )
-//            {
-//                EventHandler ev = initializeSpecificEventHandler(nullset[i],RuntimeConstants.EVENTHANDLER_NULLSET,NullSetEventHandler.class);
-//                if (ev != null)
-//                    eventCartridge.addNullSetEventHandler((NullSetEventHandler) ev);
-//            }
-//        }
-//
-//        String[] methodexception = configuration.getStringArray(RuntimeConstants.EVENTHANDLER_METHODEXCEPTION);
-//        if ( methodexception != null )
-//        {
-//            for ( int i=0; i < methodexception.length; i++ )
-//            {
-//                EventHandler ev = initializeSpecificEventHandler(methodexception[i],RuntimeConstants.EVENTHANDLER_METHODEXCEPTION,MethodExceptionEventHandler.class);
-//                if (ev != null)
-//                    eventCartridge.addMethodExceptionHandler((MethodExceptionEventHandler) ev);
-//            }
-//        }
-//
-//        String[] includeHandler = configuration.getStringArray(RuntimeConstants.EVENTHANDLER_INCLUDE);
-//        if ( includeHandler != null )
-//        {
-//            for ( int i=0; i < includeHandler.length; i++ )
-//            {
-//                EventHandler ev = initializeSpecificEventHandler(includeHandler[i],RuntimeConstants.EVENTHANDLER_INCLUDE,IncludeEventHandler.class);
-//                if (ev != null)
-//                    eventCartridge.addIncludeEventHandler((IncludeEventHandler) ev);
-//            }
-//        }
-//
-//        String[] invalidReferenceSet = configuration.getStringArray(RuntimeConstants.EVENTHANDLER_INVALIDREFERENCES);
-//        if ( invalidReferenceSet != null )
-//        {
-//            for ( int i=0; i < invalidReferenceSet.length; i++ )
-//            {
-//                EventHandler ev = initializeSpecificEventHandler(invalidReferenceSet[i],RuntimeConstants.EVENTHANDLER_INVALIDREFERENCES,InvalidReferenceEventHandler.class);
-//                if (ev != null)
-//                {
-//                    eventCartridge.addInvalidReferenceEventHandler((InvalidReferenceEventHandler) ev);
-//                }
-//            }
-//        }
-//
-//
-//    }
+    // private void initializeEventHandlers()
+    // {
+    //
+    // eventCartridge = new EventCartridge();
+    //
+    // /**
+    // * For each type of event handler, get the class name, instantiate it, and
+    // store it.
+    // */
+    //
+    // String[] referenceinsertion =
+    // configuration.getStringArray(RuntimeConstants.EVENTHANDLER_REFERENCEINSERTION);
+    // if ( referenceinsertion != null )
+    // {
+    // for ( int i=0; i < referenceinsertion.length; i++ )
+    // {
+    // EventHandler ev =
+    // initializeSpecificEventHandler(referenceinsertion[i],RuntimeConstants.EVENTHANDLER_REFERENCEINSERTION,ReferenceInsertionEventHandler.class);
+    // if (ev != null)
+    // eventCartridge.addReferenceInsertionEventHandler((ReferenceInsertionEventHandler)
+    // ev);
+    // }
+    // }
+    //
+    // String[] nullset =
+    // configuration.getStringArray(RuntimeConstants.EVENTHANDLER_NULLSET);
+    // if ( nullset != null )
+    // {
+    // for ( int i=0; i < nullset.length; i++ )
+    // {
+    // EventHandler ev =
+    // initializeSpecificEventHandler(nullset[i],RuntimeConstants.EVENTHANDLER_NULLSET,NullSetEventHandler.class);
+    // if (ev != null)
+    // eventCartridge.addNullSetEventHandler((NullSetEventHandler) ev);
+    // }
+    // }
+    //
+    // String[] methodexception =
+    // configuration.getStringArray(RuntimeConstants.EVENTHANDLER_METHODEXCEPTION);
+    // if ( methodexception != null )
+    // {
+    // for ( int i=0; i < methodexception.length; i++ )
+    // {
+    // EventHandler ev =
+    // initializeSpecificEventHandler(methodexception[i],RuntimeConstants.EVENTHANDLER_METHODEXCEPTION,MethodExceptionEventHandler.class);
+    // if (ev != null)
+    // eventCartridge.addMethodExceptionHandler((MethodExceptionEventHandler)
+    // ev);
+    // }
+    // }
+    //
+    // String[] includeHandler =
+    // configuration.getStringArray(RuntimeConstants.EVENTHANDLER_INCLUDE);
+    // if ( includeHandler != null )
+    // {
+    // for ( int i=0; i < includeHandler.length; i++ )
+    // {
+    // EventHandler ev =
+    // initializeSpecificEventHandler(includeHandler[i],RuntimeConstants.EVENTHANDLER_INCLUDE,IncludeEventHandler.class);
+    // if (ev != null)
+    // eventCartridge.addIncludeEventHandler((IncludeEventHandler) ev);
+    // }
+    // }
+    //
+    // String[] invalidReferenceSet =
+    // configuration.getStringArray(RuntimeConstants.EVENTHANDLER_INVALIDREFERENCES);
+    // if ( invalidReferenceSet != null )
+    // {
+    // for ( int i=0; i < invalidReferenceSet.length; i++ )
+    // {
+    // EventHandler ev =
+    // initializeSpecificEventHandler(invalidReferenceSet[i],RuntimeConstants.EVENTHANDLER_INVALIDREFERENCES,InvalidReferenceEventHandler.class);
+    // if (ev != null)
+    // {
+    // eventCartridge.addInvalidReferenceEventHandler((InvalidReferenceEventHandler)
+    // ev);
+    // }
+    // }
+    // }
+    //
+    //
+    // }
 
-//    private EventHandler initializeSpecificEventHandler(String classname, String paramName, Class EventHandlerInterface)
-//    {
-//        if ( classname != null && classname.length() > 0)
-//        {
-//            Object o = null;
-//            try 
-//            {
-//                o = ClassUtils.getNewInstance(classname);
-//            }
-//            catch (ClassNotFoundException cnfe )
-//            {
-//                String err = "The specified class for "
-//                    + paramName + " (" + classname
-//                    + ") does not exist or is not accessible to the current classloader.";
-//                log.error(err);
-//                throw new VelocityException(err, cnfe);
-//            }
-//            catch (InstantiationException ie)
-//            {
-//              throw new VelocityException("Could not instantiate class '" + classname + "'", ie);
-//            }
-//            catch (IllegalAccessException ae)
-//            {
-//              throw new VelocityException("Cannot access class '" + classname + "'", ae);
-//            }
-//
-//            if (!EventHandlerInterface.isAssignableFrom(EventHandlerInterface))
-//            {
-//                String err = "The specified class for " + paramName + " ("
-//                    + classname + ") does not implement "
-//                    + EventHandlerInterface.getName()
-//                    + "; Velocity is not initialized correctly.";
-//
-//                log.error(err);
-//                throw new VelocityException(err);
-//            }
-//
-//            EventHandler ev = (EventHandler) o;
-//            if ( ev instanceof RuntimeServicesAware )
-//                ((RuntimeServicesAware) ev).setRuntimeServices(this);
-//            return ev;
-//
-//        } else
-//            return null;
-//    }
+    // private EventHandler initializeSpecificEventHandler(String classname,
+    // String paramName, Class EventHandlerInterface)
+    // {
+    // if ( classname != null && classname.length() > 0)
+    // {
+    // Object o = null;
+    // try
+    // {
+    // o = ClassUtils.getNewInstance(classname);
+    // }
+    // catch (ClassNotFoundException cnfe )
+    // {
+    // String err = "The specified class for "
+    // + paramName + " (" + classname
+    // + ") does not exist or is not accessible to the current classloader.";
+    // log.error(err);
+    // throw new VelocityException(err, cnfe);
+    // }
+    // catch (InstantiationException ie)
+    // {
+    // throw new VelocityException("Could not instantiate class '" + classname +
+    // "'", ie);
+    // }
+    // catch (IllegalAccessException ae)
+    // {
+    // throw new VelocityException("Cannot access class '" + classname + "'",
+    // ae);
+    // }
+    //
+    // if (!EventHandlerInterface.isAssignableFrom(EventHandlerInterface))
+    // {
+    // String err = "The specified class for " + paramName + " ("
+    // + classname + ") does not implement "
+    // + EventHandlerInterface.getName()
+    // + "; Velocity is not initialized correctly.";
+    //
+    // log.error(err);
+    // throw new VelocityException(err);
+    // }
+    //
+    // EventHandler ev = (EventHandler) o;
+    // if ( ev instanceof RuntimeServicesAware )
+    // ((RuntimeServicesAware) ev).setRuntimeServices(this);
+    // return ev;
+    //
+    // } else
+    // return null;
+    // }
 
     /**
      * Initialize the Velocity logging system.
      */
-    private void initializeLog()
-    {
+    private void initializeLog() {
         // since the Log we started with was just placeholding,
         // let's update it with the real LogChute settings.
-        try
-        {
+        try {
             LogManager.updateLog(this.log, this);
-        } 
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new VelocityException("Error initializing log: " + e.getMessage(), e);
         }
     }
 
-
     /**
-     * This methods initializes all the directives
-     * that are used by the Velocity Runtime. The
-     * directives to be initialized are listed in
-     * the RUNTIME_DEFAULT_DIRECTIVES properties
-     * file.
+     * This methods initializes all the directives that are used by the Velocity
+     * Runtime. The directives to be initialized are listed in the
+     * RUNTIME_DEFAULT_DIRECTIVES properties file.
      */
-    private void initializeDirectives()
-    {
+    private void initializeDirectives() {
         Properties directiveProperties = new Properties();
 
         /*
-         * Grab the properties file with the list of directives
-         * that we should initialize.
+         * Grab the properties file with the list of directives that we should
+         * initialize.
          */
 
         InputStream inputStream = null;
 
-        try
-        {
+        try {
             inputStream = getClass().getResourceAsStream('/' + DEFAULT_RUNTIME_DIRECTIVES);
 
-            if (inputStream == null)
-            {
-                throw new VelocityException("Error loading directive.properties! " +
-                                    "Something is very wrong if these properties " +
-                                    "aren't being located. Either your Velocity " +
-                                    "distribution is incomplete or your Velocity " +
-                                    "jar file is corrupted!");
+            if (inputStream == null) {
+                throw new VelocityException("Error loading directive.properties! " + "Something is very wrong if these properties "
+                        + "aren't being located. Either your Velocity " + "distribution is incomplete or your Velocity " + "jar file is corrupted!");
             }
 
             directiveProperties.load(inputStream);
 
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             String msg = "Error while loading directive properties!";
             log.error(msg, ioe);
             throw new RuntimeException(msg, ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (inputStream != null)
-                {
+        } finally {
+            try {
+                if (inputStream != null) {
                     inputStream.close();
                 }
-            }
-            catch (IOException ioe)
-            {
+            } catch (IOException ioe) {
                 String msg = "Cannot close directive properties!";
                 log.error(msg, ioe);
                 throw new RuntimeException(msg, ioe);
             }
         }
 
-
         /*
-         * Grab all the values of the properties. These
-         * are all class names for example:
-         *
+         * Grab all the values of the properties. These are all class names for
+         * example:
+         * 
          * org.apache.velocity.runtime.directive.Foreach
          */
         Enumeration directiveClasses = directiveProperties.elements();
 
-        while (directiveClasses.hasMoreElements())
-        {
+        while (directiveClasses.hasMoreElements()) {
             String directiveClass = (String) directiveClasses.nextElement();
             loadDirective(directiveClass);
             log.debug("Loaded System Directive: " + directiveClass);
         }
 
         /*
-         *  now the user's directives
+         * now the user's directives
          */
 
         String[] userdirective = configuration.getStringArray("userdirective");
 
-        for( int i = 0; i < userdirective.length; i++)
-        {
+        for (int i = 0; i < userdirective.length; i++) {
             loadDirective(userdirective[i]);
-            if (log.isDebugEnabled())
-            {
+            if (log.isDebugEnabled()) {
                 log.debug("Loaded User Directive: " + userdirective[i]);
             }
         }
@@ -961,162 +839,156 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
 
     /**
      * Programatically add a directive.
+     * 
      * @param directive
      */
-    public synchronized void addDirective(Directive directive) 
-    {
+    public synchronized void addDirective(Directive directive) {
         runtimeDirectives.put(directive.getName(), directive);
         updateSharedDirectivesMap();
     }
 
     /**
      * Retrieve a previously instantiated directive.
-     * @param name name of the directive
+     * 
+     * @param name
+     *            name of the directive
      * @return the {@link Directive} for that name
      */
-    public Directive getDirective(String name) 
-    {
+    public Directive getDirective(String name) {
         return (Directive) runtimeDirectivesShared.get(name);
     }
 
     /**
      * Remove a directive.
-     * @param name name of the directive.
+     * 
+     * @param name
+     *            name of the directive.
      */
-    public synchronized void removeDirective(String name) 
-    {
+    public synchronized void removeDirective(String name) {
         runtimeDirectives.remove(name);
         updateSharedDirectivesMap();
     }
-    
+
     /**
-     * Makes an unsynchronized copy of the directives map
-     * that is used for Directive lookups by all parsers.
+     * Makes an unsynchronized copy of the directives map that is used for
+     * Directive lookups by all parsers.
      * 
-     * This follows Copy-on-Write pattern. The cost of creating
-     * a new map is acceptable since directives are typically
-     * set and modified only during Velocity setup phase.
+     * This follows Copy-on-Write pattern. The cost of creating a new map is
+     * acceptable since directives are typically set and modified only during
+     * Velocity setup phase.
      */
-    private void updateSharedDirectivesMap()
-    {
+    private void updateSharedDirectivesMap() {
         Map tmp = new HashMap(runtimeDirectives);
         runtimeDirectivesShared = tmp;
     }
 
     /**
-     *  instantiates and loads the directive with some basic checks
-     *
-     *  @param directiveClass classname of directive to load
+     * instantiates and loads the directive with some basic checks
+     * 
+     * @param directiveClass
+     *            classname of directive to load
      */
-    public void loadDirective(String directiveClass)
-    {
-        try
-        {
-            Object o = ClassUtils.getNewInstance( directiveClass );
+    public void loadDirective(String directiveClass) {
+        try {
+            Object o = ClassUtils.getNewInstance(directiveClass);
 
-            if (o instanceof Directive)
-            {
+            if (o instanceof Directive) {
                 Directive directive = (Directive) o;
                 addDirective(directive);
-            }
-            else
-            {
-                String msg = directiveClass + " does not implement "
-                    + Directive.class.getName() + "; it cannot be loaded.";
+            } else {
+                String msg = directiveClass + " does not implement " + Directive.class.getName() + "; it cannot be loaded.";
                 log.error(msg);
                 throw new VelocityException(msg);
             }
         }
-        // The ugly threesome:  ClassNotFoundException,
+        // The ugly threesome: ClassNotFoundException,
         // IllegalAccessException, InstantiationException.
         // Ignore Findbugs complaint for now.
-        catch (Exception e)
-        {
+        catch (Exception e) {
             String msg = "Failed to load Directive: " + directiveClass;
             log.error(msg, e);
             throw new VelocityException(msg, e);
         }
     }
 
-
-//    /**
-//     * Initializes the Velocity parser pool.
-//     */
-//    private void initializeParserPool()
-//    {
-//        /*
-//         * Which parser pool?
-//         */
-//        String pp = getString(RuntimeConstants.PARSER_POOL_CLASS);
-//
-//        if (pp != null && pp.length() > 0)
-//        {
-//            /*
-//             *  if something was specified, then make one.
-//             *  if that isn't a ParserPool, consider
-//             *  this a huge error and throw
-//             */
-//
-//            Object o = null;
-//
-//            try
-//            {
-//                o = ClassUtils.getNewInstance( pp );
-//            }
-//            catch (ClassNotFoundException cnfe )
-//            {
-//                String err = "The specified class for ParserPool ("
-//                    + pp
-//                    + ") does not exist (or is not accessible to the current classloader.";
-//                log.error(err);
-//                throw new VelocityException(err, cnfe);
-//            }
-//            catch (InstantiationException ie)
-//            {
-//              throw new VelocityException("Could not instantiate class '" + pp + "'", ie);
-//            }
-//            catch (IllegalAccessException ae)
-//            {
-//              throw new VelocityException("Cannot access class '" + pp + "'", ae);
-//            }
-//
-//            if (!(o instanceof ParserPool))
-//            {
-//                String err = "The specified class for ParserPool ("
-//                    + pp + ") does not implement " + ParserPool.class
-//                    + " Velocity not initialized correctly.";
-//
-//                log.error(err);
-//                throw new VelocityException(err);
-//            }
-//
-//            parserPool = (ParserPool) o;
-//
-//            parserPool.initialize(this);
-//        }
-//        else
-//        {
-//            /*
-//             *  someone screwed up.  Lets not fool around...
-//             */
-//
-//            String err = "It appears that no class was specified as the"
-//                + " ParserPool.  Please ensure that all configuration"
-//                + " information is correct.";
-//
-//            log.error(err);
-//            throw new VelocityException( err );
-//        }
-//
-//    }
+    // /**
+    // * Initializes the Velocity parser pool.
+    // */
+    // private void initializeParserPool()
+    // {
+    // /*
+    // * Which parser pool?
+    // */
+    // String pp = getString(RuntimeConstants.PARSER_POOL_CLASS);
+    //
+    // if (pp != null && pp.length() > 0)
+    // {
+    // /*
+    // * if something was specified, then make one.
+    // * if that isn't a ParserPool, consider
+    // * this a huge error and throw
+    // */
+    //
+    // Object o = null;
+    //
+    // try
+    // {
+    // o = ClassUtils.getNewInstance( pp );
+    // }
+    // catch (ClassNotFoundException cnfe )
+    // {
+    // String err = "The specified class for ParserPool ("
+    // + pp
+    // + ") does not exist (or is not accessible to the current classloader.";
+    // log.error(err);
+    // throw new VelocityException(err, cnfe);
+    // }
+    // catch (InstantiationException ie)
+    // {
+    // throw new VelocityException("Could not instantiate class '" + pp + "'",
+    // ie);
+    // }
+    // catch (IllegalAccessException ae)
+    // {
+    // throw new VelocityException("Cannot access class '" + pp + "'", ae);
+    // }
+    //
+    // if (!(o instanceof ParserPool))
+    // {
+    // String err = "The specified class for ParserPool ("
+    // + pp + ") does not implement " + ParserPool.class
+    // + " Velocity not initialized correctly.";
+    //
+    // log.error(err);
+    // throw new VelocityException(err);
+    // }
+    //
+    // parserPool = (ParserPool) o;
+    //
+    // parserPool.initialize(this);
+    // }
+    // else
+    // {
+    // /*
+    // * someone screwed up. Lets not fool around...
+    // */
+    //
+    // String err = "It appears that no class was specified as the"
+    // + " ParserPool.  Please ensure that all configuration"
+    // + " information is correct.";
+    //
+    // log.error(err);
+    // throw new VelocityException( err );
+    // }
+    //
+    // }
 
     /**
      * Returns a JavaCC generated Parser.
-     *
+     * 
      * @return Parser javacc generated parser
      */
-    public Parser createNewParser()
-    {
+    public Parser createNewParser() {
         requireInitialization();
 
         Parser parser = new Parser(this);
@@ -1124,672 +996,664 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     }
 
     /**
-     * Parse the input and return the root of
-     * AST node structure.
-     * <br><br>
-     *  In the event that it runs out of parsers in the
-     *  pool, it will create and let them be GC'd
-     *  dynamically, logging that it has to do that.  This
-     *  is considered an exceptional condition.  It is
-     *  expected that the user will set the
-     *  PARSER_POOL_SIZE property appropriately for their
-     *  application.  We will revisit this.
-     *
-     * @param string String to be parsed
-     * @param templateName name of the template being parsed
+     * Parse the input and return the root of AST node structure. <br>
+     * <br>
+     * In the event that it runs out of parsers in the pool, it will create and
+     * let them be GC'd dynamically, logging that it has to do that. This is
+     * considered an exceptional condition. It is expected that the user will
+     * set the PARSER_POOL_SIZE property appropriately for their application. We
+     * will revisit this.
+     * 
+     * @param string
+     *            String to be parsed
+     * @param templateName
+     *            name of the template being parsed
      * @return A root node representing the template as an AST tree.
-     * @throws ParseException When the string could not be parsed as a template.
+     * @throws ParseException
+     *             When the string could not be parsed as a template.
      * @since 1.6
      */
-    public SimpleNode parse(String string, String templateName)
-        throws ParseException
-    {
+    public SimpleNode parse(String string, String templateName) throws ParseException {
         return parse(new StringReader(string), templateName);
     }
 
     /**
-     * Parse the input and return the root of
-     * AST node structure.
-     * <br><br>
-     *  In the event that it runs out of parsers in the
-     *  pool, it will create and let them be GC'd
-     *  dynamically, logging that it has to do that.  This
-     *  is considered an exceptional condition.  It is
-     *  expected that the user will set the
-     *  PARSER_POOL_SIZE property appropriately for their
-     *  application.  We will revisit this.
-     *
-     * @param reader Reader retrieved by a resource loader
-     * @param templateName name of the template being parsed
+     * Parse the input and return the root of AST node structure. <br>
+     * <br>
+     * In the event that it runs out of parsers in the pool, it will create and
+     * let them be GC'd dynamically, logging that it has to do that. This is
+     * considered an exceptional condition. It is expected that the user will
+     * set the PARSER_POOL_SIZE property appropriately for their application. We
+     * will revisit this.
+     * 
+     * @param reader
+     *            Reader retrieved by a resource loader
+     * @param templateName
+     *            name of the template being parsed
      * @return A root node representing the template as an AST tree.
-     * @throws ParseException When the template could not be parsed.
+     * @throws ParseException
+     *             When the template could not be parsed.
      */
-    public SimpleNode parse(Reader reader, String templateName)
-        throws ParseException
-    {
+    public SimpleNode parse(Reader reader, String templateName) throws ParseException {
         /*
-         *  do it and dump the VM namespace for this template
+         * do it and dump the VM namespace for this template
          */
         return parse(reader, templateName, true);
     }
 
     /**
-     *  Parse the input and return the root of the AST node structure.
-     *
-     * @param reader Reader retrieved by a resource loader
-     * @param templateName name of the template being parsed
-     * @param dumpNamespace flag to dump the Velocimacro namespace for this template
+     * Parse the input and return the root of the AST node structure.
+     * 
+     * @param reader
+     *            Reader retrieved by a resource loader
+     * @param templateName
+     *            name of the template being parsed
+     * @param dumpNamespace
+     *            flag to dump the Velocimacro namespace for this template
      * @return A root node representing the template as an AST tree.
-     * @throws ParseException When the template could not be parsed.
+     * @throws ParseException
+     *             When the template could not be parsed.
      */
-    public SimpleNode parse(Reader reader, String templateName, boolean dumpNamespace)
-        throws ParseException
-    {
+    public SimpleNode parse(Reader reader, String templateName, boolean dumpNamespace) throws ParseException {
         requireInitialization();
 
         Parser parser = this.createNewParser();
-//        boolean keepParser = true;
-        if (parser == null)
-        {
+        // boolean keepParser = true;
+        if (parser == null) {
             throw new RuntimeException("Create parser instance failed.");
             /*
-             *  if we couldn't get a parser from the pool make one and log it.
+             * if we couldn't get a parser from the pool make one and log it.
              */
-//            if (log.isInfoEnabled())
-//            {
-//                log.info("Runtime : ran out of parsers. Creating a new one. "
-//                      + " Please increment the parser.pool.size property."
-//                      + " The current value is too small.");
-//            }
-//            parser = createNewParser();
-//            keepParser = false;
+            // if (log.isInfoEnabled())
+            // {
+            // log.info("Runtime : ran out of parsers. Creating a new one. "
+            // + " Please increment the parser.pool.size property."
+            // + " The current value is too small.");
+            // }
+            // parser = createNewParser();
+            // keepParser = false;
         }
 
-//        try
-//        {
-            /*
-             *  dump namespace if we are told to.  Generally, you want to
-             *  do this - you don't in special circumstances, such as
-             *  when a VM is getting init()-ed & parsed
-             */
-//            if (dumpNamespace)
-//            {
-//                dumpVMNamespace(templateName);
-//            }
-            return parser.parse(reader, templateName);
-//        }
-//        finally
-//        {
-//            if (keepParser)
-//            {
-//                parserPool.put(parser);
-//            }
-//
-//        }
+        // try
+        // {
+        /*
+         * dump namespace if we are told to. Generally, you want to do this -
+         * you don't in special circumstances, such as when a VM is getting
+         * init()-ed & parsed
+         */
+        // if (dumpNamespace)
+        // {
+        // dumpVMNamespace(templateName);
+        // }
+        return parser.parse(reader, templateName);
+        // }
+        // finally
+        // {
+        // if (keepParser)
+        // {
+        // parserPool.put(parser);
+        // }
+        //
+        // }
     }
 
-//    private void initializeEvaluateScopeSettings()
-//    {
-//        String property = evaluateScopeName+'.'+PROVIDE_SCOPE_CONTROL;
-//        provideEvaluateScope = getBoolean(property, provideEvaluateScope);
-//    }
+    // private void initializeEvaluateScopeSettings()
+    // {
+    // String property = evaluateScopeName+'.'+PROVIDE_SCOPE_CONTROL;
+    // provideEvaluateScope = getBoolean(property, provideEvaluateScope);
+    // }
 
-//    /**
-//     * Renders the input string using the context into the output writer.
-//     * To be used when a template is dynamically constructed, or want to use
-//     * Velocity as a token replacer.
-//     *
-//     * @param context context to use in rendering input string
-//     * @param out  Writer in which to render the output
-//     * @param logTag  string to be used as the template name for log
-//     *                messages in case of error
-//     * @param instring input string containing the VTL to be rendered
-//     *
-//     * @return true if successful, false otherwise.  If false, see
-//     *              Velocity runtime log
-//     * @throws ParseErrorException The template could not be parsed.
-//     * @throws MethodInvocationException A method on a context object could not be invoked.
-//     * @throws ResourceNotFoundException A referenced resource could not be loaded.
-//     * @since Velocity 1.6
-//     */
-//    public boolean evaluate(Context context,  Writer out,
-//                            String logTag, String instring)
-//    {
-//        return evaluate(context, out, logTag, new StringReader(instring));
-//    }
-//
-//    /**
-//     * Renders the input reader using the context into the output writer.
-//     * To be used when a template is dynamically constructed, or want to
-//     * use Velocity as a token replacer.
-//     *
-//     * @param context context to use in rendering input string
-//     * @param writer  Writer in which to render the output
-//     * @param logTag  string to be used as the template name for log messages
-//     *                in case of error
-//     * @param reader Reader containing the VTL to be rendered
-//     *
-//     * @return true if successful, false otherwise.  If false, see
-//     *              Velocity runtime log
-//     * @throws ParseErrorException The template could not be parsed.
-//     * @throws MethodInvocationException A method on a context object could not be invoked.
-//     * @throws ResourceNotFoundException A referenced resource could not be loaded.
-//     * @since Velocity 1.6
-//     */
-//    public boolean evaluate(Context context, Writer writer,
-//                            String logTag, Reader reader)
-//    {
-//        if (logTag == null)
-//        {
-//            throw new NullPointerException("logTag (i.e. template name) cannot be null, you must provide an identifier for the content being evaluated");
-//        }
-//
-//        SimpleNode nodeTree = null;
-//        try
-//        {
-//            nodeTree = parse(reader, logTag);
-//        }
-//        catch (ParseException pex)
-//        {
-//            throw new ParseErrorException(pex, null);
-//        }
-//        catch (TemplateInitException pex)
-//        {
-//            throw new ParseErrorException(pex, null);
-//        }
-//
-//        if (nodeTree == null)
-//        {
-//            return false;
-//        }
-//        else
-//        {
-//            return render(context, writer, logTag, nodeTree);
-//        }
-//    }
-
+    // /**
+    // * Renders the input string using the context into the output writer.
+    // * To be used when a template is dynamically constructed, or want to use
+    // * Velocity as a token replacer.
+    // *
+    // * @param context context to use in rendering input string
+    // * @param out Writer in which to render the output
+    // * @param logTag string to be used as the template name for log
+    // * messages in case of error
+    // * @param instring input string containing the VTL to be rendered
+    // *
+    // * @return true if successful, false otherwise. If false, see
+    // * Velocity runtime log
+    // * @throws ParseErrorException The template could not be parsed.
+    // * @throws MethodInvocationException A method on a context object could
+    // not be invoked.
+    // * @throws ResourceNotFoundException A referenced resource could not be
+    // loaded.
+    // * @since Velocity 1.6
+    // */
+    // public boolean evaluate(Context context, Writer out,
+    // String logTag, String instring)
+    // {
+    // return evaluate(context, out, logTag, new StringReader(instring));
+    // }
+    //
+    // /**
+    // * Renders the input reader using the context into the output writer.
+    // * To be used when a template is dynamically constructed, or want to
+    // * use Velocity as a token replacer.
+    // *
+    // * @param context context to use in rendering input string
+    // * @param writer Writer in which to render the output
+    // * @param logTag string to be used as the template name for log messages
+    // * in case of error
+    // * @param reader Reader containing the VTL to be rendered
+    // *
+    // * @return true if successful, false otherwise. If false, see
+    // * Velocity runtime log
+    // * @throws ParseErrorException The template could not be parsed.
+    // * @throws MethodInvocationException A method on a context object could
+    // not be invoked.
+    // * @throws ResourceNotFoundException A referenced resource could not be
+    // loaded.
+    // * @since Velocity 1.6
+    // */
+    // public boolean evaluate(Context context, Writer writer,
+    // String logTag, Reader reader)
+    // {
+    // if (logTag == null)
+    // {
+    // throw new
+    // NullPointerException("logTag (i.e. template name) cannot be null, you must provide an identifier for the content being evaluated");
+    // }
+    //
+    // SimpleNode nodeTree = null;
+    // try
+    // {
+    // nodeTree = parse(reader, logTag);
+    // }
+    // catch (ParseException pex)
+    // {
+    // throw new ParseErrorException(pex, null);
+    // }
+    // catch (TemplateInitException pex)
+    // {
+    // throw new ParseErrorException(pex, null);
+    // }
+    //
+    // if (nodeTree == null)
+    // {
+    // return false;
+    // }
+    // else
+    // {
+    // return render(context, writer, logTag, nodeTree);
+    // }
+    // }
 
     /**
-     * Initializes and renders the AST {@link SimpleNode} using the context
-     * into the output writer.
-     *
-     * @param context context to use in rendering input string
-     * @param writer  Writer in which to render the output
-     * @param logTag  string to be used as the template name for log messages
-     *                in case of error
-     * @param nodeTree SimpleNode which is the root of the AST to be rendered
-     *
-     * @return true if successful, false otherwise.  If false, see
-     *              Velocity runtime log for errors
-     * @throws ParseErrorException The template could not be parsed.
-     * @throws MethodInvocationException A method on a context object could not be invoked.
-     * @throws ResourceNotFoundException A referenced resource could not be loaded.
+     * Initializes and renders the AST {@link SimpleNode} using the context into
+     * the output writer.
+     * 
+     * @param context
+     *            context to use in rendering input string
+     * @param writer
+     *            Writer in which to render the output
+     * @param logTag
+     *            string to be used as the template name for log messages in
+     *            case of error
+     * @param nodeTree
+     *            SimpleNode which is the root of the AST to be rendered
+     * 
+     * @return true if successful, false otherwise. If false, see Velocity
+     *         runtime log for errors
+     * @throws ParseErrorException
+     *             The template could not be parsed.
+     * @throws MethodInvocationException
+     *             A method on a context object could not be invoked.
+     * @throws ResourceNotFoundException
+     *             A referenced resource could not be loaded.
      * @since Velocity 1.6
      */
-    public boolean render(Context context, Writer writer,
-                          String logTag, SimpleNode nodeTree)
-    {
+    public boolean render(Context context, Writer writer, String logTag, SimpleNode nodeTree) {
         /*
          * we want to init then render
          */
-        InternalContextAdapterImpl ica =
-            new InternalContextAdapterImpl(context);
+        InternalContextAdapterImpl ica = new InternalContextAdapterImpl(context);
 
         ica.pushCurrentTemplateName(logTag);
 
-        try
-        {
-            try
-            {
+        try {
+            try {
                 nodeTree.init(ica, this);
-            }
-            catch (TemplateInitException pex)
-            {
+            } catch (TemplateInitException pex) {
                 throw new ParseErrorException(pex, null);
             }
             /**
              * pass through application level runtime exceptions
              */
-            catch(RuntimeException e)
-            {
+            catch (RuntimeException e) {
                 throw e;
-            }
-            catch(Exception e)
-            {
-                String msg = "RuntimeInstance.render(): init exception for tag = "+logTag;
+            } catch (Exception e) {
+                String msg = "RuntimeInstance.render(): init exception for tag = " + logTag;
                 getLog().error(msg, e);
                 throw new VelocityException(msg, e);
             }
 
-//            try
-//            {
-//                if (provideEvaluateScope)
-//                {
-//                    Object previous = ica.get(evaluateScopeName);
-//                    context.put(evaluateScopeName, new Scope(this, previous));
-//                }
-//                nodeTree.render(ica, writer);
-//            }
-//            catch (StopCommand stop)
-//            {
-//                if (!stop.isFor(this))
-//                {
-//                    throw stop;
-//                }
-//                else if (getLog().isDebugEnabled())
-//                {
-//                    getLog().debug(stop.getMessage());
-//                }
-//            }
-//            catch (IOException e)
-//            {
-//                throw new VelocityException("IO Error in writer: " + e.getMessage(), e);
-//            }
-        }
-        finally
-        {
+            // try
+            // {
+            // if (provideEvaluateScope)
+            // {
+            // Object previous = ica.get(evaluateScopeName);
+            // context.put(evaluateScopeName, new Scope(this, previous));
+            // }
+            // nodeTree.render(ica, writer);
+            // }
+            // catch (StopCommand stop)
+            // {
+            // if (!stop.isFor(this))
+            // {
+            // throw stop;
+            // }
+            // else if (getLog().isDebugEnabled())
+            // {
+            // getLog().debug(stop.getMessage());
+            // }
+            // }
+            // catch (IOException e)
+            // {
+            // throw new VelocityException("IO Error in writer: " +
+            // e.getMessage(), e);
+            // }
+        } finally {
             ica.popCurrentTemplateName();
-//            if (provideEvaluateScope)
-//            {
-//                Object obj = ica.get(evaluateScopeName);
-//                if (obj instanceof Scope)
-//                {
-//                    Scope scope = (Scope)obj;
-//                    if (scope.getParent() != null)
-//                    {
-//                        ica.put(evaluateScopeName, scope.getParent());
-//                    }
-//                    else if (scope.getReplaced() != null)
-//                    {
-//                        ica.put(evaluateScopeName, scope.getReplaced());
-//                    }
-//                    else
-//                    {
-//                        ica.remove(evaluateScopeName);
-//                    }
-//                }
-//            }
+            // if (provideEvaluateScope)
+            // {
+            // Object obj = ica.get(evaluateScopeName);
+            // if (obj instanceof Scope)
+            // {
+            // Scope scope = (Scope)obj;
+            // if (scope.getParent() != null)
+            // {
+            // ica.put(evaluateScopeName, scope.getParent());
+            // }
+            // else if (scope.getReplaced() != null)
+            // {
+            // ica.put(evaluateScopeName, scope.getReplaced());
+            // }
+            // else
+            // {
+            // ica.remove(evaluateScopeName);
+            // }
+            // }
+            // }
         }
 
         return true;
     }
 
-//    /**
-//     * Invokes a currently registered Velocimacro with the params provided
-//     * and places the rendered stream into the writer.
-//     * <br>
-//     * Note : currently only accepts args to the VM if they are in the context.
-//     *
-//     * @param vmName name of Velocimacro to call
-//     * @param logTag string to be used for template name in case of error. if null,
-//     *               the vmName will be used
-//     * @param params keys for args used to invoke Velocimacro, in java format
-//     *               rather than VTL (eg  "foo" or "bar" rather than "$foo" or "$bar")
-//     * @param context Context object containing data/objects used for rendering.
-//     * @param writer  Writer for output stream
-//     * @return true if Velocimacro exists and successfully invoked, false otherwise.
-//     * @since 1.6
-//     */
-//    public boolean invokeVelocimacro(final String vmName, String logTag,
-//                                     String[] params, final Context context,
-//                                     final Writer writer)
-//     {
-//        /* check necessary parameters */
-//        if (vmName == null || context == null || writer == null)
-//        {
-//            String msg = "RuntimeInstance.invokeVelocimacro() : invalid call : vmName, context, and writer must not be null";
-//            getLog().error(msg);
-//            throw new NullPointerException(msg);
-//        }
-//
-//        /* handle easily corrected parameters */
-//        if (logTag == null)
-//        {
-//            logTag = vmName;
-//        }
-//        if (params == null)
-//        {
-//            params = new String[0];
-//        }
-//
-//        /* does the VM exist? */
-////        if (!isVelocimacro(vmName, logTag))
-////        {
-////            String msg = "RuntimeInstance.invokeVelocimacro() : VM '" + vmName
-////                         + "' is not registered.";
-////            getLog().error(msg);
-////            throw new VelocityException(msg);
-////        }
-//
-//        /* now just create the VM call, and use evaluate */
-//        StrBuilder template = new StrBuilder("#");
-//        template.append(vmName);
-//        template.append("(");
-//        for( int i = 0; i < params.length; i++)
-//        {
-//            template.append(" $");
-//            template.append(params[i]);
-//        }
-//        template.append(" )");
-//
-//        return evaluate(context, writer, logTag, template.toString());
-//    }
+    // /**
+    // * Invokes a currently registered Velocimacro with the params provided
+    // * and places the rendered stream into the writer.
+    // * <br>
+    // * Note : currently only accepts args to the VM if they are in the
+    // context.
+    // *
+    // * @param vmName name of Velocimacro to call
+    // * @param logTag string to be used for template name in case of error. if
+    // null,
+    // * the vmName will be used
+    // * @param params keys for args used to invoke Velocimacro, in java format
+    // * rather than VTL (eg "foo" or "bar" rather than "$foo" or "$bar")
+    // * @param context Context object containing data/objects used for
+    // rendering.
+    // * @param writer Writer for output stream
+    // * @return true if Velocimacro exists and successfully invoked, false
+    // otherwise.
+    // * @since 1.6
+    // */
+    // public boolean invokeVelocimacro(final String vmName, String logTag,
+    // String[] params, final Context context,
+    // final Writer writer)
+    // {
+    // /* check necessary parameters */
+    // if (vmName == null || context == null || writer == null)
+    // {
+    // String msg =
+    // "RuntimeInstance.invokeVelocimacro() : invalid call : vmName, context, and writer must not be null";
+    // getLog().error(msg);
+    // throw new NullPointerException(msg);
+    // }
+    //
+    // /* handle easily corrected parameters */
+    // if (logTag == null)
+    // {
+    // logTag = vmName;
+    // }
+    // if (params == null)
+    // {
+    // params = new String[0];
+    // }
+    //
+    // /* does the VM exist? */
+    // // if (!isVelocimacro(vmName, logTag))
+    // // {
+    // // String msg = "RuntimeInstance.invokeVelocimacro() : VM '" + vmName
+    // // + "' is not registered.";
+    // // getLog().error(msg);
+    // // throw new VelocityException(msg);
+    // // }
+    //
+    // /* now just create the VM call, and use evaluate */
+    // StrBuilder template = new StrBuilder("#");
+    // template.append(vmName);
+    // template.append("(");
+    // for( int i = 0; i < params.length; i++)
+    // {
+    // template.append(" $");
+    // template.append(params[i]);
+    // }
+    // template.append(" )");
+    //
+    // return evaluate(context, writer, logTag, template.toString());
+    // }
 
     /**
-     * Retrieves and caches the configured default encoding
-     * for better performance. (VELOCITY-606)
+     * Retrieves and caches the configured default encoding for better
+     * performance. (VELOCITY-606)
      */
-    private String getDefaultEncoding()
-    {
-        if (encoding == null)
-        {
+    private String getDefaultEncoding() {
+        if (encoding == null) {
             encoding = getString(INPUT_ENCODING, ENCODING_DEFAULT);
         }
         return encoding;
     }
 
     /**
-     * Returns a <code>Template</code> from the resource manager.
-     * This method assumes that the character encoding of the
-     * template is set by the <code>input.encoding</code>
-     * property.  The default is "ISO-8859-1"
-     *
-     * @param name The file name of the desired template.
-     * @return     The template.
-     * @throws ResourceNotFoundException if template not found
-     *          from any available source.
-     * @throws ParseErrorException if template cannot be parsed due
-     *          to syntax (or other) error.
+     * Returns a <code>Template</code> from the resource manager. This method
+     * assumes that the character encoding of the template is set by the
+     * <code>input.encoding</code> property. The default is "ISO-8859-1"
+     * 
+     * @param name
+     *            The file name of the desired template.
+     * @return The template.
+     * @throws ResourceNotFoundException
+     *             if template not found from any available source.
+     * @throws ParseErrorException
+     *             if template cannot be parsed due to syntax (or other) error.
      */
-    public Template getTemplate(String name)
-        throws ResourceNotFoundException, ParseErrorException
-    {
+    public Template getTemplate(String name) throws ResourceNotFoundException, ParseErrorException {
         return getTemplate(name, getDefaultEncoding());
     }
 
     /**
      * Returns a <code>Template</code> from the resource manager
-     *
-     * @param name The  name of the desired template.
-     * @param encoding Character encoding of the template
-     * @return     The template.
-     * @throws ResourceNotFoundException if template not found
-     *          from any available source.
-     * @throws ParseErrorException if template cannot be parsed due
-     *          to syntax (or other) error.
+     * 
+     * @param name
+     *            The name of the desired template.
+     * @param encoding
+     *            Character encoding of the template
+     * @return The template.
+     * @throws ResourceNotFoundException
+     *             if template not found from any available source.
+     * @throws ParseErrorException
+     *             if template cannot be parsed due to syntax (or other) error.
      */
-    public Template getTemplate(String name, String  encoding)
-        throws ResourceNotFoundException, ParseErrorException
-    {
+    public Template getTemplate(String name, String encoding) throws ResourceNotFoundException, ParseErrorException {
         requireInitialization();
 
-        return (Template)
-                resourceManager.getResource(name,
-                    ResourceManager.RESOURCE_TEMPLATE, encoding);
+        return (Template) resourceManager.getResource(name, ResourceManager.RESOURCE_TEMPLATE, encoding);
     }
 
     /**
-     * Returns a static content resource from the
-     * resource manager.  Uses the current value
-     * if INPUT_ENCODING as the character encoding.
-     *
-     * @param name Name of content resource to get
+     * Returns a static content resource from the resource manager. Uses the
+     * current value if INPUT_ENCODING as the character encoding.
+     * 
+     * @param name
+     *            Name of content resource to get
      * @return parsed ContentResource object ready for use
-     * @throws ResourceNotFoundException if template not found
-     *          from any available source.
-     * @throws ParseErrorException When the template could not be parsed.
+     * @throws ResourceNotFoundException
+     *             if template not found from any available source.
+     * @throws ParseErrorException
+     *             When the template could not be parsed.
      */
-    public ContentResource getContent(String name)
-        throws ResourceNotFoundException, ParseErrorException
-    {
+    public ContentResource getContent(String name) throws ResourceNotFoundException, ParseErrorException {
         /*
-         *  the encoding is irrelvant as we don't do any converstion
-         *  the bytestream should be dumped to the output stream
+         * the encoding is irrelvant as we don't do any converstion the
+         * bytestream should be dumped to the output stream
          */
 
         return getContent(name, getDefaultEncoding());
     }
 
     /**
-     * Returns a static content resource from the
-     * resource manager.
-     *
-     * @param name Name of content resource to get
-     * @param encoding Character encoding to use
+     * Returns a static content resource from the resource manager.
+     * 
+     * @param name
+     *            Name of content resource to get
+     * @param encoding
+     *            Character encoding to use
      * @return parsed ContentResource object ready for use
-     * @throws ResourceNotFoundException if template not found
-     *          from any available source.
-     * @throws ParseErrorException When the template could not be parsed.
+     * @throws ResourceNotFoundException
+     *             if template not found from any available source.
+     * @throws ParseErrorException
+     *             When the template could not be parsed.
      */
-    public ContentResource getContent(String name, String encoding)
-        throws ResourceNotFoundException, ParseErrorException
-    {
+    public ContentResource getContent(String name, String encoding) throws ResourceNotFoundException, ParseErrorException {
         requireInitialization();
 
-        return (ContentResource)
-                resourceManager.getResource(name,
-                        ResourceManager.RESOURCE_CONTENT, encoding);
+        return (ContentResource) resourceManager.getResource(name, ResourceManager.RESOURCE_CONTENT, encoding);
     }
 
-
     /**
-     *  Determines if a template exists and returns name of the loader that
-     *  provides it.  This is a slightly less hokey way to support
-     *  the Velocity.resourceExists() utility method, which was broken
-     *  when per-template encoding was introduced.  We can revisit this.
-     *
-     *  @param resourceName Name of template or content resource
-     *  @return class name of loader than can provide it
+     * Determines if a template exists and returns name of the loader that
+     * provides it. This is a slightly less hokey way to support the
+     * Velocity.resourceExists() utility method, which was broken when
+     * per-template encoding was introduced. We can revisit this.
+     * 
+     * @param resourceName
+     *            Name of template or content resource
+     * @return class name of loader than can provide it
      */
-    public String getLoaderNameForResource(String resourceName)
-    {
+    public String getLoaderNameForResource(String resourceName) {
         requireInitialization();
 
         return resourceManager.getLoaderNameForResource(resourceName);
     }
 
     /**
-     * Returns a convenient Log instance that wraps the current LogChute.
-     * Use this to log error messages. It has the usual methods.
-     *
+     * Returns a convenient Log instance that wraps the current LogChute. Use
+     * this to log error messages. It has the usual methods.
+     * 
      * @return A convenience Log instance that wraps the current LogChute.
      * @since 1.5
      */
-    public Log getLog()
-    {
+    public Log getLog() {
         return log;
     }
 
     /**
      * @deprecated Use getLog() and call warn() on it.
      * @see Log#warn(Object)
-     * @param message The message to log.
+     * @param message
+     *            The message to log.
      */
-    public void warn(Object message)
-    {
+    public void warn(Object message) {
         getLog().warn(message);
     }
 
     /**
      * @deprecated Use getLog() and call info() on it.
      * @see Log#info(Object)
-     * @param message The message to log.
+     * @param message
+     *            The message to log.
      */
-    public void info(Object message)
-    {
+    public void info(Object message) {
         getLog().info(message);
     }
 
     /**
      * @deprecated Use getLog() and call error() on it.
      * @see Log#error(Object)
-     * @param message The message to log.
+     * @param message
+     *            The message to log.
      */
-    public void error(Object message)
-    {
+    public void error(Object message) {
         getLog().error(message);
     }
 
     /**
      * @deprecated Use getLog() and call debug() on it.
      * @see Log#debug(Object)
-     * @param message The message to log.
+     * @param message
+     *            The message to log.
      */
-    public void debug(Object message)
-    {
+    public void debug(Object message) {
         getLog().debug(message);
     }
 
     /**
-     * String property accessor method with default to hide the
-     * configuration implementation.
-     *
-     * @param key property key
-     * @param defaultValue  default value to return if key not
-     *               found in resource manager.
+     * String property accessor method with default to hide the configuration
+     * implementation.
+     * 
+     * @param key
+     *            property key
+     * @param defaultValue
+     *            default value to return if key not found in resource manager.
      * @return value of key or default
      */
-    public String getString( String key, String defaultValue)
-    {
+    public String getString(String key, String defaultValue) {
         return configuration.getString(key, defaultValue);
     }
 
-    /* --------------------------------------------------------------------
-     * R U N T I M E  A C C E S S O R  M E T H O D S
+    /*
+     * -------------------------------------------------------------------- R U
+     * N T I M E A C C E S S O R M E T H O D S
      * --------------------------------------------------------------------
-     * These are the getXXX() methods that are a simple wrapper
-     * around the configuration object. This is an attempt
-     * to make a the Velocity Runtime the single access point
-     * for all things Velocity, and allow the Runtime to
-     * adhere as closely as possible the the Mediator pattern
-     * which is the ultimate goal.
+     * These are the getXXX() methods that are a simple wrapper around the
+     * configuration object. This is an attempt to make a the Velocity Runtime
+     * the single access point for all things Velocity, and allow the Runtime to
+     * adhere as closely as possible the the Mediator pattern which is the
+     * ultimate goal.
      * --------------------------------------------------------------------
      */
 
     /**
      * String property accessor method to hide the configuration implementation
-     * @param key  property key
-     * @return   value of key or null
+     * 
+     * @param key
+     *            property key
+     * @return value of key or null
      */
-    public String getString(String key)
-    {
+    public String getString(String key) {
         return StringUtils.nullTrim(configuration.getString(key));
     }
 
     /**
      * Int property accessor method to hide the configuration implementation.
-     *
-     * @param key Property key
+     * 
+     * @param key
+     *            Property key
      * @return value
      */
-    public int getInt(String key)
-    {
+    public int getInt(String key) {
         return configuration.getInt(key);
     }
 
     /**
      * Int property accessor method to hide the configuration implementation.
-     *
-     * @param key  property key
-     * @param defaultValue The default value.
+     * 
+     * @param key
+     *            property key
+     * @param defaultValue
+     *            The default value.
      * @return value
      */
-    public int getInt(String key, int defaultValue)
-    {
+    public int getInt(String key, int defaultValue) {
         return configuration.getInt(key, defaultValue);
     }
 
     /**
-     * Boolean property accessor method to hide the configuration implementation.
-     *
-     * @param key property key
-     * @param def The default value if property not found.
+     * Boolean property accessor method to hide the configuration
+     * implementation.
+     * 
+     * @param key
+     *            property key
+     * @param def
+     *            The default value if property not found.
      * @return value of key or default value
      */
-    public boolean getBoolean(String key, boolean def)
-    {
+    public boolean getBoolean(String key, boolean def) {
         return configuration.getBoolean(key, def);
     }
 
     /**
      * Return the velocity runtime configuration object.
-     *
+     * 
      * @return Configuration object which houses the Velocity runtime
-     * properties.
+     *         properties.
      */
-    public ExtendedProperties getConfiguration()
-    {
+    public ExtendedProperties getConfiguration() {
         return configuration;
     }
 
     /**
-     *  Return the Introspector for this instance
+     * Return the Introspector for this instance
+     * 
      * @return The Introspector for this instance
      */
-    public Introspector getIntrospector()
-    {
+    public Introspector getIntrospector() {
         return introspector;
     }
 
-//    /**
-//     * Returns the event handlers for the application.
-//     * @return The event handlers for the application.
-//     * @since 1.5
-//     */
-//    public EventCartridge getApplicationEventCartridge()
-//    {
-//        return eventCartridge;
-//    }
-
+    // /**
+    // * Returns the event handlers for the application.
+    // * @return The event handlers for the application.
+    // * @since 1.5
+    // */
+    // public EventCartridge getApplicationEventCartridge()
+    // {
+    // return eventCartridge;
+    // }
 
     /**
-     *  Gets the application attribute for the given key
-     *
+     * Gets the application attribute for the given key
+     * 
      * @param key
      * @return The application attribute for the given key.
      */
-    public Object getApplicationAttribute(Object key)
-    {
+    public Object getApplicationAttribute(Object key) {
         return applicationAttributes.get(key);
     }
 
     /**
-     *   Sets the application attribute for the given key
-     *
+     * Sets the application attribute for the given key
+     * 
      * @param key
-     * @param o The new application attribute.
-     * @return The old value of this attribute or null if it hasn't been set before.
+     * @param o
+     *            The new application attribute.
+     * @return The old value of this attribute or null if it hasn't been set
+     *         before.
      */
-    public Object setApplicationAttribute(Object key, Object o)
-    {
+    public Object setApplicationAttribute(Object key, Object o) {
         return applicationAttributes.put(key, o);
     }
 
     /**
      * Returns the Uberspect object for this Instance.
-     *
+     * 
      * @return The Uberspect object for this Instance.
      */
-    public Uberspect getUberspect()
-    {
+    public Uberspect getUberspect() {
         return uberSpect;
     }
 
     public Template getTempSupportRelPath(String name, String inputEncoding, String curPath) {
-        if(name.startsWith("/")){
+        if (name.startsWith("/")) {
             // 绝对路径
             return this.getTemplate(name, inputEncoding);
-        }else{
+        } else {
             // 相对路径
             return this.getTemplate(ImplHelper.resolveAbsName(name, curPath), inputEncoding);
         }
     }
 
     public Resource getCttSupportRelPath(String name, String inputEncoding, String curPath) {
-        if(name.startsWith("/")){
+        if (name.startsWith("/")) {
             // 绝对路径
             return this.getContent(name, inputEncoding);
-        }else{
+        } else {
             // 相对路径
             return this.getContent(ImplHelper.resolveAbsName(name, curPath), inputEncoding);
         }
@@ -1798,6 +1662,17 @@ public class RuntimeInstance implements RuntimeConstants, RuntimeServices
     public void init(ExtendedProperties props) {
         setProperties(props);
         init();
+    }
+
+    /**
+     * 获取string常量template
+     */
+    public Template getStringTemplate(String templateString) {
+        requireInitialization();
+        Template ret = new StringTemplate(templateString);
+        ret.setRuntimeServices(this);
+        ret.process();
+        return ret;
     }
 
 }
