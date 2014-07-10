@@ -15,7 +15,12 @@
  ******************************************************************************/
 package com.github.pfmiles.minvelocity;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
+
+import com.github.pfmiles.org.apache.velocity.runtime.RuntimeConstants;
 
 /**
  * @author pf-miles
@@ -67,5 +72,34 @@ public class ImplHelper {
             }
         }
         return ImplHelper.class.getClassLoader();
+    }
+
+    /**
+     * 将数据从from中，以bufferSize个字符为缓冲，“流”入to中，并关闭from; 可对总的读取字符数做限制
+     * 
+     * @param from
+     *            数据源 into array
+     * @param to
+     *            目的地
+     * @param bufferSize
+     *            缓冲大小
+     * @param totalSize
+     *            总读取字符数限制
+     * @throws IOException
+     */
+    public static void flowing(Reader from, Writer to, int bufferSize, int totalSize) throws IOException {
+        if (bufferSize < 1)
+            bufferSize = RuntimeConstants.DEFAULT_REFERENCE_RENDERING_BUFFER_SIZE;
+        if (totalSize < 1)
+            totalSize = RuntimeConstants.DEFAULT_REFERENCE_RENDERING_LIMIT;
+        char[] buffer = new char[bufferSize];
+        int read = 0;
+        for (int i = from.read(buffer); i != -1; i = from.read(buffer)) {
+            to.write(buffer, 0, i);
+            read += i;
+            if (read >= totalSize)
+                break;
+        }
+        from.close();
     }
 }

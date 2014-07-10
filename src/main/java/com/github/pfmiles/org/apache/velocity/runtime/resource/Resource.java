@@ -192,7 +192,7 @@ public abstract class Resource
 
     /**
      *  set the encoding of this resource
-     *  for example, "ISO-8859-1"
+     *  for example, "UTF-8"
      * @param encoding
      */
     public void setEncoding( String encoding )
@@ -202,7 +202,7 @@ public abstract class Resource
 
     /**
      *  get the encoding of this resource
-     *  for example, "ISO-8859-1"
+     *  for example, "UTF-8"
      * @return The encoding of this resource.
      */
     public String getEncoding()

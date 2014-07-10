@@ -290,7 +290,7 @@ public class VelocityEngine implements RuntimeConstants {
     // * Merges a template and puts the rendered stream into the writer.
     // * The default encoding that Velocity uses to read template files is
     // defined in
-    // * the property input.encoding and defaults to ISO-8859-1.
+    // * the property input.encoding and defaults to UTF-8.
     // *
     // * @param templateName name of template to be used in merge
     // * @param context filled context to be used in merge

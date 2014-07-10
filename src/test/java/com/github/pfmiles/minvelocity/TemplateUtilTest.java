@@ -1,5 +1,6 @@
 package com.github.pfmiles.minvelocity;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,5 +39,15 @@ public class TemplateUtilTest extends TestCase {
         TemplateUtil.renderTemplate(temp, ctxPojo, out);
         // System.out.println(out.toString());
         assertTrue("one\ntwo\nthree\n".equals(out.toString()));
+    }
+
+    public void testRefRendering() {
+        Template temp = TemplateUtil.parseStringTemplate("hello $ref world");
+        Map<String, Object> ctxPojo = new HashMap<String, Object>();
+        StringReader stream = new StringReader("1234567890");
+        ctxPojo.put("ref", stream);
+        StringWriter writer = new StringWriter();
+        TemplateUtil.renderTemplate(temp, ctxPojo, writer);
+        assertTrue("hello 1234567890 world".equals(writer.toString()));
     }
 }
