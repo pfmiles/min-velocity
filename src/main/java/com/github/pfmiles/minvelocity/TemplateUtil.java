@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -131,7 +132,13 @@ public class TemplateUtil {
 
     @SuppressWarnings("unchecked")
     private static void putAllDefaultStaticUtils(Context ctx) {
-        List<String> ms = (List<String>) tempEngine.getProperty(RuntimeConstants.DEFAULT_STATIC_UTIL_MAPPINGS);
+        List<String> ms = null;
+        Object prop = tempEngine.getProperty(RuntimeConstants.DEFAULT_STATIC_UTIL_MAPPINGS);
+        if (prop instanceof String) {
+            ms = Arrays.asList((String) prop);
+        } else {
+            ms = (List<String>) prop;
+        }
         if (ms != null)
             for (String m : ms) {
                 String[] kv = m.split(":");
