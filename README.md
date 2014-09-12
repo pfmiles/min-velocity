@@ -25,7 +25,8 @@
 * min-velocity.properties可使用default.static.util.mappings属性配置默认的静态工具类，这些工具类将被默认放入模板context中，可配置多个，如：default.static.util.mappings = ClassUtils:org.apache.commons.lang.ClassUtils
 * 设置'stream.reference.rendering'开关(true/false)，默认关闭; 开启后，遇到reference是stream或reader的时候, 将读取stream或reader中的内容做渲染而非简单地toString渲染; 其中读取stream或reader的buffer可通过'stream.reference.rendering.buffer.size'配置大小(默认为1024个字符);
 亦可通过'stream.reference.rendering.limit'选项设置能够从流中读取的最大字符数限制(默认为100000)
-* 支持String模板渲染，即直接将模板内容以String形式传入api进行渲染而不是只能选择传入一个模板路径
+* 支持String模板渲染，即直接将模板内容以String形式传入api进行渲染而不是只能选择传入一个模板路径  
+* 新增index.out.of.bounds.exception.suppress选项，当设置为true时，模板中对数组或list进行的取值或设置操作将忽略index out of bounds异常
 
 ## For English speakers, see below:
 * No event mechanism
@@ -50,3 +51,4 @@ with this config you can reference to org.apache.commons.lang.ClassUtils class w
 * stream/reader reference rendering supported. If you set 'stream.reference.rendering'(default false) to 'true', min-velocity will dump the contents of a stream/reader reference rather than just invoking 'toString' on them while rendering.
 And the stream/reader reading buffer size could be specified by configuration 'stream.reference.rendering.buffer.size', measured in number of characters(default 1024). And further more, the maximum number of characters read from a stream could be limited by configuration 'stream.reference.rendering.limit'(default 100000).
 * String literal templates rendering supported. Just specify template contents in a in-memory-String value to render, other than always specify a template path.
+* When 'index.out.of.bounds.exception.suppress' option is setting to be 'true'，any 'IndexOutOfBoundsException' will be ignored when accessing or setting elements of arrays and lists.  

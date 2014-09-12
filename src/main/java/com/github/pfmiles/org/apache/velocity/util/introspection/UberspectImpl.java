@@ -26,7 +26,10 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.github.pfmiles.minvelocity.IndexOutOfBoundsIgnoringList;
 import com.github.pfmiles.org.apache.velocity.exception.VelocityException;
+import com.github.pfmiles.org.apache.velocity.runtime.RuntimeConstants;
+import com.github.pfmiles.org.apache.velocity.runtime.RuntimeServices;
 import com.github.pfmiles.org.apache.velocity.runtime.log.Log;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.node.AbstractExecutor;
 import com.github.pfmiles.org.apache.velocity.runtime.parser.node.BooleanPropertyExecutor;
@@ -40,231 +43,186 @@ import com.github.pfmiles.org.apache.velocity.runtime.parser.node.SetPropertyExe
 import com.github.pfmiles.org.apache.velocity.util.ArrayIterator;
 import com.github.pfmiles.org.apache.velocity.util.ArrayListWrapper;
 import com.github.pfmiles.org.apache.velocity.util.EnumerationIterator;
+import com.github.pfmiles.org.apache.velocity.util.RuntimeServicesAware;
 
 /**
- *  Implementation of Uberspect to provide the default introspective
- *  functionality of Velocity
- *
+ * Implementation of Uberspect to provide the default introspective
+ * functionality of Velocity
+ * 
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @author <a href="mailto:henning@apache.org">Henning P. Schmiedehausen</a>
  * @version $Id: UberspectImpl.java 898032 2010-01-11 19:51:03Z nbubna $
  */
-public class UberspectImpl implements Uberspect, UberspectLoggable
-{
+public class UberspectImpl implements Uberspect, UberspectLoggable, RuntimeServicesAware {
+    protected RuntimeServices runtimeServices;
     /**
-     *  Our runtime logger.
+     * Our runtime logger.
      */
     protected Log log;
 
     /**
-     *  the default Velocity introspector
+     * the default Velocity introspector
      */
     protected Introspector introspector;
 
     /**
-     *  init - generates the Introspector. As the setup code
-     *  makes sure that the log gets set before this is called,
-     *  we can initialize the Introspector using the log object.
+     * init - generates the Introspector. As the setup code makes sure that the
+     * log gets set before this is called, we can initialize the Introspector
+     * using the log object.
      */
-    public void init()
-    {
+    public void init() {
         introspector = new Introspector(log);
     }
 
     /**
-     *  Sets the runtime logger - this must be called before anything
-     *  else.
-     *
-     * @param log The logger instance to use.
+     * Sets the runtime logger - this must be called before anything else.
+     * 
+     * @param log
+     *            The logger instance to use.
      * @since 1.5
      */
-    public void setLog(Log log)
-    {
+    public void setLog(Log log) {
         this.log = log;
     }
 
-
     /**
-     *  To support iterative objects used in a <code>#foreach()</code>
-     *  loop.
-     *
-     * @param obj The iterative object.
-     * @param i Info about the object's location.
+     * To support iterative objects used in a <code>#foreach()</code> loop.
+     * 
+     * @param obj
+     *            The iterative object.
+     * @param i
+     *            Info about the object's location.
      * @return An {@link Iterator} object.
      */
-    public Iterator getIterator(Object obj, Info i)
-        throws Exception
-    {
-        if (obj.getClass().isArray())
-        {
+    public Iterator getIterator(Object obj, Info i) throws Exception {
+        if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
-        }
-        else if (obj instanceof Collection)
-        {
+        } else if (obj instanceof Collection) {
             return ((Collection) obj).iterator();
-        }
-        else if (obj instanceof Map)
-        {
+        } else if (obj instanceof Map) {
             return ((Map) obj).values().iterator();
-        }
-        else if (obj instanceof Iterator)
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug("The iterative object in the #foreach() loop at " +
-                           i + " is of type java.util.Iterator.  Because " +
-                           "it is not resettable, if used in more than once it " +
-                           "may lead to unexpected results.");
+        } else if (obj instanceof Iterator) {
+            if (log.isDebugEnabled()) {
+                log.debug("The iterative object in the #foreach() loop at " + i + " is of type java.util.Iterator.  Because "
+                        + "it is not resettable, if used in more than once it " + "may lead to unexpected results.");
             }
             return ((Iterator) obj);
-        }
-        else if (obj instanceof Enumeration)
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug("The iterative object in the #foreach() loop at " +
-                           i + " is of type java.util.Enumeration.  Because " +
-                           "it is not resettable, if used in more than once it " +
-                           "may lead to unexpected results.");
+        } else if (obj instanceof Enumeration) {
+            if (log.isDebugEnabled()) {
+                log.debug("The iterative object in the #foreach() loop at " + i + " is of type java.util.Enumeration.  Because "
+                        + "it is not resettable, if used in more than once it " + "may lead to unexpected results.");
             }
             return new EnumerationIterator((Enumeration) obj);
-        }
-        else
-        {
+        } else {
             // look for an iterator() method to support the JDK5 Iterable
             // interface or any user tools/DTOs that want to work in
             // foreach without implementing the Collection interface
             Class type = obj.getClass();
-            try
-            {
+            try {
                 Method iter = type.getMethod("iterator", null);
                 Class returns = iter.getReturnType();
-                if (Iterator.class.isAssignableFrom(returns))
-                {
-                    try
-                    {
-                        return (Iterator)iter.invoke(obj, null);
-                    } 
-                    catch (Exception e)
-                    {
-                        throw new VelocityException("Error invoking the method 'iterator' on class '" 
-                            + obj.getClass().getName() +"'", e);
+                if (Iterator.class.isAssignableFrom(returns)) {
+                    try {
+                        return (Iterator) iter.invoke(obj, null);
+                    } catch (Exception e) {
+                        throw new VelocityException("Error invoking the method 'iterator' on class '" + obj.getClass().getName() + "'", e);
                     }
+                } else {
+                    log.debug("iterator() method of reference in #foreach loop at " + i + " does not return a true Iterator.");
                 }
-                else
-                {
-                    log.debug("iterator() method of reference in #foreach loop at "
-                              + i + " does not return a true Iterator.");
-                }
-            }
-            catch (NoSuchMethodException nsme)
-            {
+            } catch (NoSuchMethodException nsme) {
                 // eat this one, but let all other exceptions thru
             }
         }
 
-        /*  we have no clue what this is  */
+        /* we have no clue what this is */
         log.debug("Could not determine type of iterator in #foreach loop at " + i);
 
         return null;
     }
 
     /**
-     *  Method
+     * Method
+     * 
      * @param obj
      * @param methodName
      * @param args
      * @param i
      * @return A Velocity Method.
      */
-    public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i)
-        throws Exception
-    {
-        if (obj == null)
-        {
+    public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i) throws Exception {
+        if (obj == null) {
             return null;
         }
-
         Method m = introspector.getMethod(obj.getClass(), methodName, args);
-        if (m != null)
-        {
-            return new VelMethodImpl(m);
+        if (m != null) {
+            return new VelMethodImpl(m, log, runtimeServices);
         }
 
         Class cls = obj.getClass();
         // if it's an array
-        if (cls.isArray())
-        {
+        if (cls.isArray()) {
             // check for support via our array->list wrapper
             m = introspector.getMethod(ArrayListWrapper.class, methodName, args);
-            if (m != null)
-            {
+            if (m != null) {
                 // and create a method that knows to wrap the value
                 // before invoking the method
-                return new VelMethodImpl(m, true);
+                return new VelMethodImpl(m, true, log, runtimeServices);
             }
         }
-        // watch for classes, to allow calling their static methods (VELOCITY-102)
-        else if (cls == Class.class)
-        {
-            m = introspector.getMethod((Class)obj, methodName, args);
-            if (m != null)
-            {
-                return new VelMethodImpl(m);
+        // watch for classes, to allow calling their static methods
+        // (VELOCITY-102)
+        else if (cls == Class.class) {
+            m = introspector.getMethod((Class) obj, methodName, args);
+            if (m != null) {
+                return new VelMethodImpl(m, log, runtimeServices);
             }
         }
         return null;
     }
 
     /**
-     * Property  getter
+     * Property getter
+     * 
      * @param obj
      * @param identifier
      * @param i
      * @return A Velocity Getter Method.
      * @throws Exception
      */
-    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i)
-        throws Exception
-    {
-        if (obj == null)
-        {
+    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i) throws Exception {
+        if (obj == null) {
             return null;
         }
 
         Class claz = obj.getClass();
 
         /*
-         *  first try for a getFoo() type of property
-         *  (also getfoo() )
+         * first try for a getFoo() type of property (also getfoo() )
          */
         AbstractExecutor executor = new PropertyExecutor(log, introspector, claz, identifier);
 
         /*
          * Let's see if we are a map...
          */
-        if (!executor.isAlive()) 
-        {
+        if (!executor.isAlive()) {
             executor = new MapGetExecutor(log, claz, identifier);
         }
 
         /*
-         *  if that didn't work, look for get("foo")
+         * if that didn't work, look for get("foo")
          */
 
-        if (!executor.isAlive())
-        {
+        if (!executor.isAlive()) {
             executor = new GetExecutor(log, introspector, claz, identifier);
         }
 
         /*
-         *  finally, look for boolean isFoo()
+         * finally, look for boolean isFoo()
          */
 
-        if (!executor.isAlive())
-        {
-            executor = new BooleanPropertyExecutor(log, introspector, claz,
-                                                   identifier);
+        if (!executor.isAlive()) {
+            executor = new BooleanPropertyExecutor(log, introspector, claz, identifier);
         }
 
         return (executor.isAlive()) ? new VelGetterImpl(executor) : null;
@@ -272,6 +230,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
 
     /**
      * Property setter
+     * 
      * @param obj
      * @param identifier
      * @param arg
@@ -279,35 +238,30 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
      * @return A Velocity Setter method.
      * @throws Exception
      */
-    public VelPropertySet getPropertySet(Object obj, String identifier,
-                                         Object arg, Info i) throws Exception
-    {
-        if (obj == null)
-        {
+    public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i) throws Exception {
+        if (obj == null) {
             return null;
         }
 
         Class claz = obj.getClass();
 
         /*
-         *  first try for a setFoo() type of property
-         *  (also setfoo() )
+         * first try for a setFoo() type of property (also setfoo() )
          */
         SetExecutor executor = new SetPropertyExecutor(log, introspector, claz, identifier, arg);
 
         /*
          * Let's see if we are a map...
          */
-        if (!executor.isAlive())  {
+        if (!executor.isAlive()) {
             executor = new MapSetExecutor(log, claz, identifier);
         }
 
         /*
-         *  if that didn't work, look for put("foo", arg)
+         * if that didn't work, look for put("foo", arg)
          */
 
-        if (!executor.isAlive())
-        {
+        if (!executor.isAlive()) {
             executor = new PutExecutor(log, introspector, claz, arg, identifier);
         }
 
@@ -315,71 +269,89 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
     }
 
     /**
-     *  Implementation of VelMethod
+     * Implementation of VelMethod
      */
-    public static class VelMethodImpl implements VelMethod
-    {
-        final Method method;
+    public static class VelMethodImpl implements VelMethod {
+        Method method;
         Boolean isVarArg;
         boolean wrapArray;
+        Log log;
+        RuntimeServices runtimeServices;
 
         /**
          * @param m
          */
-        public VelMethodImpl(Method m)
-        {
-            this(m, false);
+        public VelMethodImpl(Method m, Log log, RuntimeServices rs) {
+            this(m, false, log, rs);
         }
 
         /**
          * @since 1.6
          */
-        public VelMethodImpl(Method method, boolean wrapArray)
-        {
+        public VelMethodImpl(Method method, boolean wrapArray, Log log, RuntimeServices rs) {
             this.method = method;
             this.wrapArray = wrapArray;
+            this.log = log;
+            this.runtimeServices = rs;
         }
 
-        private VelMethodImpl()
-        {
+        private VelMethodImpl() {
             method = null;
         }
 
         /**
          * @see VelMethod#invoke(java.lang.Object, java.lang.Object[])
          */
-        public Object invoke(Object o, Object[] actual)
-            throws Exception
-        {
+        public Object invoke(Object o, Object[] actual) throws Exception {
             // if we're pretending an array is a list...
-            if (wrapArray)
-            {
-                o = new ArrayListWrapper(o);
+            if (wrapArray) {
+                o = new ArrayListWrapper(o, log, runtimeServices);
             }
 
-            if (isVarArg())
-            {
+            if (isVarArg()) {
                 Class[] formal = method.getParameterTypes();
                 int index = formal.length - 1;
-                if (actual.length >= index)
-                {
+                if (actual.length >= index) {
                     Class type = formal[index].getComponentType();
                     actual = handleVarArg(type, index, actual);
                 }
+            }
+
+            // 若是list.get(int)或list.set(int, Object)且打开了越界忽略选项,
+            // 则将其包装为忽略越界的list实现
+            if (isListGetOrSetAndSupressing(method)) {
+                o = new IndexOutOfBoundsIgnoringList(o, log);
+                this.method = resolveNewGetOrSetMethod(method);
             }
 
             // call extension point invocation
             return doInvoke(o, actual);
         }
 
+        private Method resolveNewGetOrSetMethod(Method old) {
+            if ("get".equals(old.getName())) {
+                return IndexOutOfBoundsIgnoringList.getMethod;
+            } else {
+                return IndexOutOfBoundsIgnoringList.setMethod;
+            }
+        }
+
+        private boolean isListGetOrSetAndSupressing(Method m) {
+            String name = m.getName();
+            Class<?>[] paramTypes = m.getParameterTypes();
+            return (name.equals("get") && paramTypes.length == 1 && int.class.equals(paramTypes[0]) || name.equals("set") && paramTypes.length == 2
+                    && int.class.equals(paramTypes[0]) && Object.class.equals(paramTypes[1]))
+                    && runtimeServices.getBoolean(RuntimeConstants.SUPPRESS_INDEX_OUT_OF_BOUNDS_EXCEPTION, false);
+        }
+
         /**
-         * Offers an extension point for subclasses (in alternate Uberspects)
-         * to alter the invocation after any array wrapping or varargs handling
-         * has already been completed.
+         * Offers an extension point for subclasses (in alternate Uberspects) to
+         * alter the invocation after any array wrapping or varargs handling has
+         * already been completed.
+         * 
          * @since 1.6
          */
-        protected Object doInvoke(Object o, Object[] actual) throws Exception
-        {
+        protected Object doInvoke(Object o, Object[] actual) throws Exception {
             return method.invoke(o, actual);
         }
 
@@ -387,17 +359,12 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
          * @return true if this method can accept a variable number of arguments
          * @since 1.6
          */
-        public boolean isVarArg()
-        {
-            if (isVarArg == null)
-            {
+        public boolean isVarArg() {
+            if (isVarArg == null) {
                 Class[] formal = method.getParameterTypes();
-                if (formal == null || formal.length == 0)
-                {
+                if (formal == null || formal.length == 0) {
                     this.isVarArg = Boolean.FALSE;
-                }
-                else
-                {
+                } else {
                     Class last = formal[formal.length - 1];
                     // if the last arg is an array, then
                     // we consider this a varargs method
@@ -408,22 +375,21 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
         }
 
         /**
-         * @param type The vararg class type (aka component type
-         *             of the expected array arg)
-         * @param index The index of the vararg in the method declaration
-         *              (This will always be one less than the number of
-         *               expected arguments.)
-         * @param actual The actual parameters being passed to this method
-         * @returns The actual parameters adjusted for the varargs in order
-         *          to fit the method declaration.
+         * @param type
+         *            The vararg class type (aka component type of the expected
+         *            array arg)
+         * @param index
+         *            The index of the vararg in the method declaration (This
+         *            will always be one less than the number of expected
+         *            arguments.)
+         * @param actual
+         *            The actual parameters being passed to this method
+         * @returns The actual parameters adjusted for the varargs in order to
+         *          fit the method declaration.
          */
-        private Object[] handleVarArg(final Class type,
-                                      final int index,
-                                      Object[] actual)
-        {
+        private Object[] handleVarArg(final Class type, final int index, Object[] actual) {
             // if no values are being passed into the vararg
-            if (actual.length == index)
-            {
+            if (actual.length == index) {
                 // copy existing args to new array
                 Object[] newActual = new Object[actual.length + 1];
                 System.arraycopy(actual, 0, newActual, 0, actual.length);
@@ -432,36 +398,30 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
                 actual = newActual;
             }
             // if one value is being passed into the vararg
-            else if (actual.length == index + 1 && actual[index] != null)
-            {
+            else if (actual.length == index + 1 && actual[index] != null) {
                 // make sure the last arg is an array of the expected type
                 Class argClass = actual[index].getClass();
-                if (!argClass.isArray() &&
-                    IntrospectionUtils.isMethodInvocationConvertible(type,
-                                                                     argClass,
-                                                                     false))
-                {
-                    // create a 1-length array to hold and replace the last param
+                if (!argClass.isArray() && IntrospectionUtils.isMethodInvocationConvertible(type, argClass, false)) {
+                    // create a 1-length array to hold and replace the last
+                    // param
                     Object lastActual = Array.newInstance(type, 1);
                     Array.set(lastActual, 0, actual[index]);
                     actual[index] = lastActual;
                 }
             }
             // if multiple values are being passed into the vararg
-            else if (actual.length > index + 1)
-            {
-                // put the last and extra actual in an array of the expected type
+            else if (actual.length > index + 1) {
+                // put the last and extra actual in an array of the expected
+                // type
                 int size = actual.length - index;
                 Object lastActual = Array.newInstance(type, size);
-                for (int i = 0; i < size; i++)
-                {
+                for (int i = 0; i < size; i++) {
                     Array.set(lastActual, i, actual[index + i]);
                 }
 
                 // put all into a new actual array of the appropriate size
                 Object[] newActual = new Object[index + 1];
-                for (int i = 0; i < index; i++)
-                {
+                for (int i = 0; i < index; i++) {
                     newActual[i] = actual[i];
                 }
                 newActual[index] = lastActual;
@@ -475,24 +435,21 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
         /**
          * @see org.apache.velocity.util.introspection.VelMethod#isCacheable()
          */
-        public boolean isCacheable()
-        {
+        public boolean isCacheable() {
             return true;
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelMethod#getMethodName()
          */
-        public String getMethodName()
-        {
+        public String getMethodName() {
             return method.getName();
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelMethod#getReturnType()
          */
-        public Class getReturnType()
-        {
+        public Class getReturnType() {
             return method.getReturnType();
         }
     }
@@ -501,45 +458,38 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
      *
      *
      */
-    public static class VelGetterImpl implements VelPropertyGet
-    {
+    public static class VelGetterImpl implements VelPropertyGet {
         final AbstractExecutor getExecutor;
 
         /**
          * @param exec
          */
-        public VelGetterImpl(AbstractExecutor exec)
-        {
+        public VelGetterImpl(AbstractExecutor exec) {
             getExecutor = exec;
         }
 
-        private VelGetterImpl()
-        {
+        private VelGetterImpl() {
             getExecutor = null;
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelPropertyGet#invoke(java.lang.Object)
          */
-        public Object invoke(Object o)
-            throws Exception
-        {
+        public Object invoke(Object o) throws Exception {
             return getExecutor.execute(o);
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelPropertyGet#isCacheable()
          */
-        public boolean isCacheable()
-        {
+        public boolean isCacheable() {
             return true;
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelPropertyGet#getMethodName()
          */
-        public String getMethodName()
-        {
+        public String getMethodName() {
             return getExecutor.isAlive() ? getExecutor.getMethod().getName() : null;
         }
     }
@@ -547,51 +497,46 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
     /**
      *
      */
-    public static class VelSetterImpl implements VelPropertySet
-    {
+    public static class VelSetterImpl implements VelPropertySet {
         private final SetExecutor setExecutor;
 
         /**
          * @param setExecutor
          */
-        public VelSetterImpl(final SetExecutor setExecutor)
-        {
+        public VelSetterImpl(final SetExecutor setExecutor) {
             this.setExecutor = setExecutor;
-        }
-
-        private VelSetterImpl()
-        {
-            setExecutor = null;
         }
 
         /**
          * Invoke the found Set Executor.
-         *
-         * @param o is the Object to invoke it on.
-         * @param value in the Value to set.
+         * 
+         * @param o
+         *            is the Object to invoke it on.
+         * @param value
+         *            in the Value to set.
          * @return The resulting Object.
          * @throws Exception
          */
-        public Object invoke(final Object o, final Object value)
-            throws Exception
-        {
+        public Object invoke(final Object o, final Object value) throws Exception {
             return setExecutor.execute(o, value);
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelPropertySet#isCacheable()
          */
-        public boolean isCacheable()
-        {
+        public boolean isCacheable() {
             return true;
         }
 
         /**
          * @see org.apache.velocity.util.introspection.VelPropertySet#getMethodName()
          */
-        public String getMethodName()
-        {
+        public String getMethodName() {
             return setExecutor.isAlive() ? setExecutor.getMethod().getName() : null;
         }
+    }
+
+    public void setRuntimeServices(RuntimeServices rs) {
+        this.runtimeServices = rs;
     }
 }

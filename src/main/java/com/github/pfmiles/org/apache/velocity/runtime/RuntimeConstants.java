@@ -445,4 +445,9 @@ public interface RuntimeConstants {
      * 指定流式渲染最大从流中读取字符数限制
      */
     String STREAM_REFERENCE_RENDERING_LIMIT = "stream.reference.rendering.limit";
+
+    /**
+     * 配置为true时，模板渲染时忽略数组和list访问时可能抛出的index越界异常, 转而返回null并记录warning日志
+     */
+    String SUPPRESS_INDEX_OUT_OF_BOUNDS_EXCEPTION = "index.out.of.bounds.exception.suppress";
 }

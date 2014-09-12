@@ -22,36 +22,66 @@ package com.github.pfmiles.org.apache.velocity.util;
 import java.lang.reflect.Array;
 import java.util.AbstractList;
 
+import com.github.pfmiles.org.apache.velocity.runtime.RuntimeConstants;
+import com.github.pfmiles.org.apache.velocity.runtime.RuntimeServices;
+import com.github.pfmiles.org.apache.velocity.runtime.log.Log;
+
 /**
  * A class that wraps an array with a List interface.
- *
+ * 
  * @author Chris Schultz &lt;chris@christopherschultz.net$gt;
- * @version $Revision: 685685 $ $Date: 2006-04-14 19:40:41 $
- * @since 1.6
+ * @author pf-miles
  */
-public class ArrayListWrapper extends AbstractList
-{
+public class ArrayListWrapper extends AbstractList {
     private Object array;
+    private Log log;
+    private RuntimeServices runtimeServices;
 
-    public ArrayListWrapper(Object array)
-    {
+    public ArrayListWrapper(Object array, Log log, RuntimeServices rs) {
         this.array = array;
+        this.log = log;
+        this.runtimeServices = rs;
     }
 
-    public Object get(int index)
-    {
-        return Array.get(array, index);
+    public Object get(int index) {
+        boolean supressExp = this.runtimeServices.getBoolean(RuntimeConstants.SUPPRESS_INDEX_OUT_OF_BOUNDS_EXCEPTION, false);
+        if (supressExp) {
+            try {
+                return Array.get(array, index);
+            } catch (NullPointerException e) {
+                log.info("Null array encountered when rendering template while accessing its elements, suppressed.");
+                return null;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                log.info("Array index out of bounds when rendering template while accessing its elements, suppressed.");
+                return null;
+            }
+        } else {
+            return Array.get(array, index);
+        }
     }
 
-    public Object set(int index, Object element)
-    {
-        Object old = get(index);
-        Array.set(array, index, element);
-        return old;
+    public Object set(int index, Object element) {
+        boolean supressExp = this.runtimeServices.getBoolean(RuntimeConstants.SUPPRESS_INDEX_OUT_OF_BOUNDS_EXCEPTION, false);
+        if (supressExp) {
+            Object old = get(index);
+            try {
+                Array.set(array, index, element);
+            } catch (NullPointerException e) {
+                log.info("Null array encountered when rendering template while setting its elements, suppressed.");
+                return null;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                log.info("Array index out of bounds when rendering template while setting its elements, suppressed.");
+                return null;
+            }
+            return old;
+        } else {
+            Object old = get(index);
+            Array.set(array, index, element);
+            return old;
+        }
     }
 
-    public int size()
-    {
+    public int size() {
         return Array.getLength(array);
     }
 
