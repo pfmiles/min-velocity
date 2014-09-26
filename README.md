@@ -51,4 +51,13 @@ with this config you can reference to org.apache.commons.lang.ClassUtils class w
 * stream/reader reference rendering supported. If you set 'stream.reference.rendering'(default false) to 'true', min-velocity will dump the contents of a stream/reader reference rather than just invoking 'toString' on them while rendering.
 And the stream/reader reading buffer size could be specified by configuration 'stream.reference.rendering.buffer.size', measured in number of characters(default 1024). And further more, the maximum number of characters read from a stream could be limited by configuration 'stream.reference.rendering.limit'(default 100000).
 * String literal templates rendering supported. Just specify template contents in a in-memory-String value to render, other than always specify a template path.
-* When 'index.out.of.bounds.exception.suppress' option is setting to be 'true'，any 'IndexOutOfBoundsException' will be ignored when accessing or setting elements of arrays and lists.  
+* When 'index.out.of.bounds.exception.suppress' option is setting to be 'true'，any 'IndexOutOfBoundsException' will be ignored when accessing or setting elements of arrays and lists.
+
+## Maven Central Repo:  
+
+    <dependency>
+        <groupId>com.github.pfmiles</groupId>
+        <artifactId>min-velocity</artifactId>
+        <version>1.0</version>
+    </dependency>
+    

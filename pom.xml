@@ -8,7 +8,27 @@
 	<packaging>jar</packaging>
 
 	<name>min-velocity</name>
-	<url>https://github.com/pfmiles/min-velocity</url>
+    <description>A simplified velocity implementation for code generation.</description>
+    <url>https://github.com/pfmiles/min-velocity</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/pfmiles/min-velocity</url>
+        <connection>scm:git:git@github.com:pfmiles/min-velocity.git</connection>
+    </scm>
+    <developers>
+        <developer>
+            <id>pf_miles</id>
+            <name>Yue Wen</name>
+            <email>miles.wy.1@gmail.com</email>
+        </developer>
+    </developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,6 +70,18 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>
