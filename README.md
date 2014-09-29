@@ -12,7 +12,7 @@
 * 没有break
 
 ## 改动：
-* requires jdk1.5+
+* requires jdk1.6+
 * 默认情况下，不打印任何日志
 * 默认采用classpath模板加载器而非文件系统模板加载器
 * default I/O encoding changed to UTF-8(from iso-8859-1)
