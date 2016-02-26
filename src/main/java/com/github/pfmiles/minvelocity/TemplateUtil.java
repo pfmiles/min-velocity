@@ -109,6 +109,17 @@ public class TemplateUtil {
     }
 
     /**
+     * 根据tempPath找到对应的模板，解析后返回
+     * 
+     * @param tempPath
+     *            模板路径
+     * @return 解析好的template对象
+     */
+    public static Template getTemplate(String tempPath) {
+        return tempEngine.getTemplate(tempPath, "UTF-8");
+    }
+
+    /**
      * 渲染模板
      * 
      * @param temp
@@ -122,6 +133,15 @@ public class TemplateUtil {
         Context ctx = new VelocityContext();
         prepareCtx(ctxPojo, ctx);
         tempEngine.mergeTemplate(temp, ctx, out);
+    }
+
+    /**
+     * 渲染模板，直接返回渲染好的string
+     */
+    public static <T> String renderTemplate(Template temp, T ctxPojo) {
+        StringWriter w = new StringWriter();
+        renderTemplate(temp, ctxPojo, w);
+        return w.toString();
     }
 
     private static <T> void prepareCtx(T ctxPojo, Context ctx) {
