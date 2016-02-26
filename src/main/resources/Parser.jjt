@@ -20,6 +20,7 @@
 /*
  *  NOTE : please see documentation at bottom of this file. (It was placed there its tiring
  *    to always have to page past it... :)
+ *  2016.02.26 pf-miles: Chinese characters are allowed in references.
  */
 options
 {

@@ -50,4 +50,15 @@ public class TemplateUtilTest extends TestCase {
         TemplateUtil.renderTemplate(temp, ctxPojo, writer);
         assertTrue("hello 1234567890 world".equals(writer.toString()));
     }
+
+    public void testChineseRefRendering() {
+        Template temp = TemplateUtil.parseStringTemplate("hello $温悦 ${张玮玮} world");
+        Map<String, Object> ctxPojo = new HashMap<String, Object>();
+        StringReader stream = new StringReader("1234567890");
+        ctxPojo.put("温悦", stream);
+        ctxPojo.put("张玮玮", "haha");
+        StringWriter writer = new StringWriter();
+        TemplateUtil.renderTemplate(temp, ctxPojo, writer);
+        assertTrue("hello 1234567890 haha world".equals(writer.toString()));
+    }
 }

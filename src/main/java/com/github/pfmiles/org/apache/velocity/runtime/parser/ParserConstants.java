@@ -131,19 +131,21 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int IDENTIFIER_CHAR = 65;
   /** RegularExpression Id. */
-  int IDENTIFIER = 66;
+  int CHINESE_CHAR = 66;
   /** RegularExpression Id. */
-  int DOT = 67;
+  int IDENTIFIER = 67;
   /** RegularExpression Id. */
-  int LCURLY = 68;
+  int DOT = 68;
   /** RegularExpression Id. */
-  int RCURLY = 69;
+  int LCURLY = 69;
   /** RegularExpression Id. */
-  int REFERENCE_TERMINATOR = 70;
+  int RCURLY = 70;
   /** RegularExpression Id. */
-  int DIRECTIVE_TERMINATOR = 71;
+  int REFERENCE_TERMINATOR = 71;
   /** RegularExpression Id. */
-  int EMPTY_INDEX = 72;
+  int DIRECTIVE_TERMINATOR = 72;
+  /** RegularExpression Id. */
+  int EMPTY_INDEX = 73;
 
   /** Lexical state. */
   int REFERENCE = 0;
@@ -238,6 +240,7 @@ public interface ParserConstants {
     "<ALPHA_CHAR>",
     "<ALPHANUM_CHAR>",
     "<IDENTIFIER_CHAR>",
+    "<CHINESE_CHAR>",
     "<IDENTIFIER>",
     "<DOT>",
     "\"{\"",
