@@ -128,10 +128,10 @@ public class ClassMap
         // Ah, the miracles of Java for(;;) ... 
         for (Class classToReflect = getCachedClass(); classToReflect != null ; classToReflect = classToReflect.getSuperclass())
         {
-            if (Modifier.isPublic(classToReflect.getModifiers()))
-            {
-                populateMethodCacheWith(methodCache, classToReflect);
-            }
+//            if (Modifier.isPublic(classToReflect.getModifiers()))
+//            {
+            populateMethodCacheWith(methodCache, classToReflect);
+//            }
             Class [] interfaces = classToReflect.getInterfaces();
             for (int i = 0; i < interfaces.length; i++)
             {
@@ -168,11 +168,12 @@ public class ClassMap
             Method[] methods = classToReflect.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++)
             {
-                int modifiers = methods[i].getModifiers();
-                if (Modifier.isPublic(modifiers))
-                {
-                    methodCache.put(methods[i]);
-                }
+//                int modifiers = methods[i].getModifiers();
+//                if (Modifier.isPublic(modifiers))
+//                {
+                methods[i].setAccessible(true);
+                methodCache.put(methods[i]);
+//                }
             }
         }
         catch (SecurityException se) // Everybody feels better with...

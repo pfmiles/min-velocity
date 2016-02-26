@@ -27,6 +27,8 @@
 亦可通过'stream.reference.rendering.limit'选项设置能够从流中读取的最大字符数限制(默认为100000)
 * 支持String模板渲染，即直接将模板内容以String形式传入api进行渲染而不是只能选择传入一个模板路径  
 * 新增index.out.of.bounds.exception.suppress选项，当设置为true时，模板中对数组或list进行的取值或设置操作将忽略index out of bounds异常
+* [NEW in 1.1.0] 支持中文模板变量引用, 如${温悦}
+* [NEW in 1.1.0] 支持非public类、属性、方法的调用、取值渲染
 
 ## For English speakers, see below:
 * No event mechanism

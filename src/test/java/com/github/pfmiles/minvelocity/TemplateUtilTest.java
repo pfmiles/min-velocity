@@ -51,6 +51,22 @@ public class TemplateUtilTest extends TestCase {
         assertTrue("hello 1234567890 world".equals(writer.toString()));
     }
 
+    private static final class 中文类 {
+        public String[] 中文数组;
+
+        public 中文类() {
+            this.中文数组 = new String[] { "^_^" };
+        }
+
+        public String[] 获取中文数组() {
+            return this.中文数组;
+        }
+
+        public String[] get中文数组() {
+            return this.中文数组;
+        }
+    }
+
     public void testChineseRefRendering() {
         Template temp = TemplateUtil.parseStringTemplate("hello $温悦 ${张玮玮} world");
         Map<String, Object> ctxPojo = new HashMap<String, Object>();
@@ -60,5 +76,22 @@ public class TemplateUtilTest extends TestCase {
         StringWriter writer = new StringWriter();
         TemplateUtil.renderTemplate(temp, ctxPojo, writer);
         assertTrue("hello 1234567890 haha world".equals(writer.toString()));
+
+        // 中文方法调用
+        temp = TemplateUtil.parseStringTemplate("hello $!{中文类.获取中文数组()[0]} world");
+        ctxPojo = new HashMap<String, Object>();
+        ctxPojo.put("中文类", new 中文类());
+        writer = new StringWriter();
+        TemplateUtil.renderTemplate(temp, ctxPojo, writer);
+        assertTrue("hello ^_^ world".equals(writer.toString()));
+
+        // 中文数组调用
+        temp = TemplateUtil.parseStringTemplate("hello $!{中文类.中文数组[0]} world");
+        ctxPojo = new HashMap<String, Object>();
+        ctxPojo.put("中文类", new 中文类());
+        writer = new StringWriter();
+        TemplateUtil.renderTemplate(temp, ctxPojo, writer);
+        assertTrue("hello ^_^ world".equals(writer.toString()));
     }
+
 }
