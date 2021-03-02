@@ -27,7 +27,7 @@
 亦可通过'stream.reference.rendering.limit'选项设置能够从流中读取的最大字符数限制(默认为100000)
 * 支持String模板渲染，即直接将模板内容以String形式传入api进行渲染而不是只能选择传入一个模板路径  
 * 新增index.out.of.bounds.exception.suppress选项，当设置为true时，模板中对数组或list进行的取值或设置操作将忽略index out of bounds异常
-* [since v1.1.0] 支持中文模板变量引用, 如`${温悦}`或`${温悦.写代码()}`
+* [since v1.1.0] 支持中文模板变量引用, 如`${我们}`或`${我们.写代码()}`
 * [since v1.1.0] 支持非public类、属性、方法的调用、取值渲染
 
 ## For English speakers, see below:
@@ -54,7 +54,7 @@ with this config you can reference to org.apache.commons.lang.ClassUtils class w
 And the stream/reader reading buffer size could be specified by configuration 'stream.reference.rendering.buffer.size', measured in number of characters(default 1024). And further more, the maximum number of characters read from a stream could be limited by configuration 'stream.reference.rendering.limit'(default 100000).
 * String literal templates rendering supported. Just specify template contents in a in-memory-String value to render, other than always specify a template path.
 * When 'index.out.of.bounds.exception.suppress' option is setting to be 'true'，any 'IndexOutOfBoundsException' will be ignored when accessing or setting elements of arrays and lists.
-* [since v1.1.0] Chinese reference rendering supported, ${温悦} or ${温悦.写代码()} for example.
+* [since v1.1.0] Chinese reference rendering supported, ${我们} or ${我们.写代码()} for example.
 * [since v1.1.0] Reference rendering upon non-public classes, methods or fields supported.
 
 ## Maven Central Repo:  
